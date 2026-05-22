@@ -1,0 +1,1300 @@
+
+---
+title: "Car Loan EDA Analysis"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+    theme: cosmo
+    self_contained: true
+---
+
+
+```{r}
+# ============================================================================
+# LOAD REQUIRED LIBRARIES
+# ============================================================================
+library(tidyverse)      # Data manipulation and visualization
+library(caret)          # Data preprocessing
+library(corrplot)       # Correlation visualization
+library(gridExtra)      # Arranging multiple plots
+library(knitr)          # Table formatting
+install.packages("GGally", repos = "https://cloud.r-project.org")
+library(GGally)         # Advanced pair plots
+
+# Set seed for reproducibility
+set.seed(42)
+
+```
+
+
+```{r}
+# ============================================================================
+# 1. DATA LOADING AND INITIAL INSPECTION
+# ============================================================================
+
+# Load the dataset
+data <- read.csv("car_loan_data_with_tenure.csv", stringsAsFactors = FALSE)
+
+# Display basic information
+cat("Dataset Dimensions:", dim(data)[1], "rows ×", dim(data)[2], "columns\n\n")
+
+# Structure overview
+str(data)
+
+# First few rows
+# Load required package
+if(!require(knitr, quietly = TRUE)) {
+  install.packages("knitr")
+  library(knitr)
+}
+
+# Display first 5 rows with kable
+print(kable(head(data, 5), 
+            caption = "First 5 Rows of Dataset",
+            format = "simple",
+            align = "c"))
+
+# Check for missing values
+missing_summary <- data.frame(
+  Variable = names(data),
+  Missing_Count = colSums(is.na(data)),
+  Missing_Percent = round(colSums(is.na(data))/nrow(data)*100, 2)
+)
+
+kable(missing_summary, caption = "Missing Values Summary")
+
+```
+
+
+
+```{r}
+# ============================================================================
+# 2. DATA PREPARATION
+# ============================================================================
+
+# Convert categorical variables to factors
+data$salary_range <- as.factor(data$salary_range)
+data$repaid_loan_on_prev_car <- as.factor(data$repaid_loan_on_prev_car)
+data$repaid <- as.factor(data$repaid)
+data$size_of_downpayment <- as.numeric(gsub("%", "", data$size_of_downpayment)) / 100
+# Define variable types
+numerical_vars <- c("car_value", "debt_to_income_ratio", "loan_length", "size_of_downpayment","driver_tenure")
+categorical_vars <- c("salary_range", "repaid_loan_on_prev_car",  "repaid")
+
+# Target variable distribution
+target_dist <- prop.table(table(data$repaid))
+cat("\n📊 Target Variable Distribution:\n")
+cat("  Not Repaid (0):", round(target_dist[1]*100, 1), "%\n")
+cat("  Repaid (1):    ", round(target_dist[2]*100, 1), "%\n")
+
+
+
+```
+
+```{r}
+# ============================================================================
+# 3. DATA QUALITY SUMMARY
+# ============================================================================
+
+quality_report <- data.frame(
+  Metric = c("Total Observations", "Total Variables", "Numerical Variables", 
+             "Categorical Variables", "Missing Values", 
+             "Class Imbalance Ratio", "Target: Not Repaid (%)", "Target: Repaid (%)"),
+  Value = c(
+    nrow(data), 
+    ncol(data), 
+    length(numerical_vars), 
+    length(categorical_vars), 
+    sum(colSums(is.na(data))),
+    round(max(target_dist)/min(target_dist), 2),
+    round(target_dist[1]*100, 1),
+    round(target_dist[2]*100, 1)
+  )
+)
+
+kable(quality_report, caption = "Data Quality Summary", align = 'lr')
+
+```
+
+```{r}
+# ============================================================================
+# 4. NUMERICAL VARIABLES SUMMARY
+# ============================================================================
+
+cat("\n=== 步骤4：数值型变量汇总统计 ===\n")
+
+# 方法1：手动指定数值型变量（推荐 - 更明确）
+numerical_vars <- c(
+  "car_value", 
+  "debt_to_income_ratio", 
+  "loan_length", 
+  "driver_tenure",
+  "size_of_downpayment"
+)
+
+# 方法2：自动识别数值型变量（备选）
+# numerical_vars <- names(data)[sapply(data, is.numeric)]
+
+# 验证数据类型
+cat("\n检查变量类型:\n")
+print(sapply(data[numerical_vars], class))
+
+# 创建汇总统计表
+summary_stats <- data.frame(
+  Variable = numerical_vars,
+  Mean = round(sapply(data[numerical_vars], mean, na.rm = TRUE), 2),
+  Median = round(sapply(data[numerical_vars], median, na.rm = TRUE), 2),
+  SD = round(sapply(data[numerical_vars], sd, na.rm = TRUE), 2),
+  Min = round(sapply(data[numerical_vars], min, na.rm = TRUE), 2),
+  Max = round(sapply(data[numerical_vars], max, na.rm = TRUE), 2),
+  Q1 = round(sapply(data[numerical_vars], quantile, 0.25, na.rm = TRUE), 2),
+  Q3 = round(sapply(data[numerical_vars], quantile, 0.75, na.rm = TRUE), 2)
+)
+
+# 显示表格
+kable(summary_stats, 
+      caption = "Summary Statistics for Numerical Variables",
+      align = 'c')
+
+cat("\n✅ 数值型变量统计完成！\n")
+
+
+```
+
+
+```{r}
+# ============================================================================
+# 5. NUMERICAL VARIABLES DISTRIBUTIONS (改进版)
+# ============================================================================
+library(ggplot2)
+library(gridExtra)
+
+# 确保只选择数值型变量
+numerical_vars <- names(data)[sapply(data, is.numeric)]
+
+# 数据验证和清理
+for(var in numerical_vars) {
+  cat("\n=== Checking", var, "===\n")
+  print(summary(data[[var]]))
+  print(paste("Range:", min(data[[var]], na.rm=TRUE), "to", max(data[[var]], na.rm=TRUE)))
+  print(paste("Unique values:", length(unique(data[[var]]))))
+}
+
+# Histograms
+plot_list_hist <- list()
+
+for(var in numerical_vars) {
+  if(is.numeric(data[[var]]) && length(unique(data[[var]])) > 5) {
+    
+    mean_val <- mean(data[[var]], na.rm = TRUE)
+    
+    # 特殊处理 debt_to_income_ratio
+    if(var == "debt_to_income_ratio") {
+      # 确保数据在 0-1 范围内
+      if(max(data[[var]], na.rm = TRUE) > 1) {
+        data[[var]] <- data[[var]] / 100
+        mean_val <- mean(data[[var]], na.rm = TRUE)
+        message("Converted debt_to_income_ratio to ratio scale")
+      }
+      
+      # 设置合理的横轴范围
+      p <- ggplot(data, aes_string(x = var)) +
+        geom_histogram(fill = "steelblue", color = "black", bins = 30, alpha = 0.7) +
+        geom_vline(aes(xintercept = mean_val), 
+                   color = "red", linetype = "dashed", size = 1) +
+        scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+        labs(title = paste("Distribution of", var),
+             subtitle = paste("Mean:", round(mean_val, 2)),
+             x = var, y = "Frequency") +
+        theme_minimal() +
+        theme(plot.title = element_text(face = "bold"))
+    } else {
+      # 其他变量正常绘制
+      p <- ggplot(data, aes_string(x = var)) +
+        geom_histogram(fill = "steelblue", color = "black", bins = 30, alpha = 0.7) +
+        geom_vline(aes(xintercept = mean_val), 
+                   color = "red", linetype = "dashed", size = 1) +
+        labs(title = paste("Distribution of", var),
+             subtitle = paste("Mean:", round(mean_val, 2)),
+             x = var, y = "Frequency") +
+        theme_minimal() +
+        theme(plot.title = element_text(face = "bold"))
+    }
+    
+    plot_list_hist[[var]] <- p
+  }
+}
+
+# 绘制
+if(length(plot_list_hist) > 0) {
+  grid.arrange(grobs = plot_list_hist, ncol = 2, 
+               top = "Histograms of Numerical Variables")
+}
+
+
+```
+
+```{r}
+
+# ============================================================================
+# 5.1 Size_Downpayment VARIABLES DISTRIBUTIONS
+# ============================================================================
+ls()
+ggplot(data, aes(x = factor(size_of_downpayment))) +
+  geom_bar(fill = "steelblue", alpha = 0.8) +
+  labs(title = "Size of Downpayment",
+       x = "Size of Downpayment", y = "Number") +
+  theme_minimal()
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+# ============================================================================
+# 6. OUTLIER DETECTION (IQR METHOD)
+# ============================================================================
+# Full script: Load -> Inspect -> Prepare -> Outlier detection (ignore size_of_downpayment)
+# ============================================================================
+
+# --- 0. Setup ---------------------------------------------------------------
+set.seed(42)
+library(ggplot2)
+library(grid)
+library(gridExtra)
+# knitr::kable used for pretty tables if knitr available
+if(!requireNamespace("knitr", quietly = TRUE)) {
+  message("knitr not installed — results will print as data.frames")
+}
+
+# --- 1. Load data ----------------------------------------------------------
+fname <- "car_loan_data_with_tenure.csv"
+if(!file.exists(fname)) stop("File not found: ", fname, "\nPut the CSV in the working directory or change 'fname'.")
+data <- read.csv(fname,
+                 stringsAsFactors = FALSE,
+                 na.strings = c("", "NA", "N/A"),
+                 strip.white = TRUE,
+                 fileEncoding = "UTF-8")
+
+cat("Loaded dataset:", nrow(data), "rows x", ncol(data), "cols\n")
+
+# --- 2. Quick structure & head ---------------------------------------------
+cat("\n--- Structure ---\n")
+str(data)
+cat("\n--- First 6 rows ---\n")
+print(head(data, 6))
+
+# --- 3. Basic type conversions (keep minimal) ------------------------------
+# Make sure commonly used categorical columns are factors
+if("salary_range" %in% names(data)) data$salary_range <- as.factor(data$salary_range)
+if("repaid" %in% names(data)) data$repaid <- as.factor(as.character(data$repaid))
+if("repaid_loan_on_prev_car" %in% names(data)) data$repaid_loan_on_prev_car <- as.factor(as.character(data$repaid_loan_on_prev_car))
+
+# Note: we intentionally DO NOT convert/clean size_of_downpayment here because user asked to ignore it.
+
+# --- 4. Define numerical_vars and explicitly remove size_of_downpayment ---
+# Auto-detect numeric columns then select the ones we want to analyse
+numerical_vars <- names(data)[sapply(data, is.numeric)]
+
+# Ensure typical expected numeric columns included (fallback)
+expected_nums <- c("car_value", "debt_to_income_ratio", "loan_length", "driver_tenure", "size_of_downpayment")
+# keep intersection but rely on detected numerics primarily
+numerical_vars <- intersect(numerical_vars, expected_nums)
+
+# Remove size_of_downpayment as requested
+numerical_vars <- setdiff(numerical_vars, "size_of_downpayment")
+
+if(length(numerical_vars) == 0) stop("No numeric variables selected for analysis after excluding size_of_downpayment.")
+
+cat("\nNumeric variables to be analysed:\n")
+print(numerical_vars)
+
+# --- 5. Summary stats for chosen numeric vars ------------------------------
+summary_stats <- data.frame(
+  Variable = numerical_vars,
+  Mean = sapply(data[numerical_vars], function(x) round(mean(x, na.rm = TRUE), 2)),
+  Median = sapply(data[numerical_vars], function(x) round(median(x, na.rm = TRUE), 2)),
+  SD = sapply(data[numerical_vars], function(x) round(sd(x, na.rm = TRUE), 2)),
+  Min = sapply(data[numerical_vars], function(x) round(min(x, na.rm = TRUE), 2)),
+  Q1 = sapply(data[numerical_vars], function(x) round(quantile(x, 0.25, na.rm = TRUE), 2)),
+  Q3 = sapply(data[numerical_vars], function(x) round(quantile(x, 0.75, na.rm = TRUE), 2)),
+  Max = sapply(data[numerical_vars], function(x) round(max(x, na.rm = TRUE), 2)),
+  stringsAsFactors = FALSE
+)
+
+cat("\nSummary statistics:\n")
+if(requireNamespace("knitr", quietly = TRUE)) {
+  print(knitr::kable(summary_stats, caption = "Summary Statistics for Numerical Variables"))
+} else {
+  print(summary_stats)
+}
+
+# --- 6. Robust outlier detector --------------------------------------------
+detect_outliers <- function(x, k = 1.5) {
+  # Force numeric and remove NA
+  x_num <- as.numeric(x)
+  x_num <- x_num[!is.na(x_num)]
+  if(length(x_num) < 2) {
+    return(list(count = 0, percentage = 0, lower_bound = NA, upper_bound = NA))
+  }
+  Q1 <- quantile(x_num, 0.25, na.rm = TRUE)
+  Q3 <- quantile(x_num, 0.75, na.rm = TRUE)
+  IQRv <- Q3 - Q1
+  lower_bound <- Q1 - k * IQRv
+  upper_bound <- Q3 + k * IQRv
+  outliers <- (x_num < lower_bound) | (x_num > upper_bound)
+  list(
+    count = sum(outliers, na.rm = TRUE),
+    percentage = mean(outliers, na.rm = TRUE) * 100,
+    lower_bound = as.numeric(lower_bound),
+    upper_bound = as.numeric(upper_bound)
+  )
+}
+
+# Prepare summary table
+outlier_summary <- data.frame(
+  Variable = numerical_vars,
+  Outlier_Count = integer(length(numerical_vars)),
+  Outlier_Percent = numeric(length(numerical_vars)),
+  Lower_Bound = numeric(length(numerical_vars)),
+  Upper_Bound = numeric(length(numerical_vars)),
+  stringsAsFactors = FALSE
+)
+
+for(i in seq_along(numerical_vars)) {
+  var <- numerical_vars[i]
+  info <- tryCatch(
+    detect_outliers(data[[var]]),
+    error = function(e) list(count = NA, percentage = NA, lower_bound = NA, upper_bound = NA)
+  )
+  outlier_summary[i, "Outlier_Count"] <- info$count
+  outlier_summary[i, "Outlier_Percent"] <- round(info$percentage, 2)
+  outlier_summary[i, "Lower_Bound"] <- round(as.numeric(info$lower_bound), 2)
+  outlier_summary[i, "Upper_Bound"] <- round(as.numeric(info$upper_bound), 2)
+}
+
+cat("\nOutlier summary:\n")
+if(requireNamespace("knitr", quietly = TRUE)) {
+  print(knitr::kable(outlier_summary, caption = "🔍 Outlier Detection Results (IQR Method, k=1.5)"))
+} else {
+  print(outlier_summary)
+}
+
+# --- 7. Boxplots for numeric vars ------------------------------------------
+plot_list_box <- list()
+for(var in numerical_vars) {
+  # Use aes_string for programmatic var mapping
+  p <- ggplot(data, aes_string(y = var)) +
+    geom_boxplot(fill = "lightblue", color = "black", alpha = 0.7, na.rm = TRUE) +
+    labs(title = paste("Boxplot of", var), y = var) +
+    theme_minimal() +
+    theme(plot.title = element_text(face = "bold"))
+  plot_list_box[[var]] <- p
+}
+
+# Arrange plots (2 columns)
+if(length(plot_list_box) > 0) {
+  do.call(grid.arrange, c(plot_list_box, ncol = 2, top = "Boxplots for Outlier Detection"))
+} else {
+  message("No boxplots to draw.")
+}
+
+# --- End -------------------------------------------------------------------
+cat("\nDone. Note: 'size_of_downpayment' has been excluded from numeric analysis as requested.\n")
+
+
+```
+```{r}
+# ============================================================================
+# 7. CATEGORICAL VARIABLES SUMMARY
+# ============================================================================
+
+# Summary table for categorical variables
+cat_summary <- data.frame(
+  Variable = categorical_vars,
+  N_Categories = sapply(data[categorical_vars], function(x) length(unique(x))),
+  Most_Common = sapply(data[categorical_vars], function(x) {
+    tbl <- table(x)
+    names(tbl)[which.max(tbl)]
+  }),
+  Most_Common_Freq = sapply(data[categorical_vars], function(x) {
+    tbl <- table(x)
+    max(tbl)
+  }),
+  Most_Common_Pct = sapply(data[categorical_vars], function(x) {
+    round(max(prop.table(table(x)))*100, 1)
+  })
+)
+
+kable(cat_summary, caption = "📊 Categorical Variables Summary")
+
+# Bar plots
+plot_list_cat <- list()
+for(var in categorical_vars) {
+  p <- ggplot(data, aes_string(x = var)) +
+    geom_bar(fill = "steelblue", color = "black", alpha = 0.7) +
+    geom_text(stat = 'count', aes(label = after_stat(count)), 
+              vjust = -0.5, size = 3.5, fontface = "bold") +
+    labs(title = paste("Distribution of", var),
+         x = var, y = "Count") +
+    theme_minimal() +
+    theme(plot.title = element_text(face = "bold"),
+          axis.text.x = element_text(angle = 45, hjust = 1))
+  plot_list_cat[[var]] <- p
+}
+
+grid.arrange(grobs = plot_list_cat, ncol = 2, 
+             top = "Bar Charts of Categorical Variables")
+
+```
+
+
+```{r}
+# ============================================================================
+# 8. BIVARIATE ANALYSIS - NUMERICAL VS TARGET
+# ============================================================================
+
+# Violin plots with boxplots (combines density and boxplot)
+plot_list_violin <- list()
+for(var in numerical_vars) {
+  p <- ggplot(data, aes_string(x = "repaid", y = var, fill = "repaid")) +
+    geom_violin(alpha = 0.5, trim = FALSE) +
+    geom_boxplot(width = 0.2, alpha = 0.8, outlier.size = 1) +
+    scale_fill_manual(values = c("0" = "grey", "1" = "lightblue")) +
+    labs(title = paste(var, "by Loan Repayment Status"),
+         x = "Repaid", y = var) +
+    theme_minimal() +
+    theme(legend.position = "none",
+          plot.title = element_text(face = "bold"))
+  plot_list_violin[[var]] <- p
+}
+
+grid.arrange(grobs = plot_list_violin, ncol = 2, 
+             top = "Violin Plots: Numerical Variables by Repayment Status")
+
+# Statistical comparison with t-tests
+comparison_results <- data.frame(
+  Variable = numerical_vars,
+  Mean_NotRepaid = numeric(length(numerical_vars)),
+  Mean_Repaid = numeric(length(numerical_vars)),
+  Difference = numeric(length(numerical_vars)),
+  T_Test_PValue = numeric(length(numerical_vars)),
+  Significant = character(length(numerical_vars)),
+  stringsAsFactors = FALSE
+)
+
+for(i in seq_along(numerical_vars)) {
+  var <- numerical_vars[i]
+  mean_0 <- mean(data[[var]][data$repaid == 0], na.rm = TRUE)
+  mean_1 <- mean(data[[var]][data$repaid == 1], na.rm = TRUE)
+  
+  test_result <- t.test(data[[var]] ~ data$repaid)
+  
+  comparison_results[i, 2:6] <- c(
+    round(mean_0, 2),
+    round(mean_1, 2),
+    round(mean_1 - mean_0, 2),
+    round(test_result$p.value, 4),
+    ifelse(test_result$p.value < 0.05, "✓ Yes", "✗ No")
+  )
+}
+
+kable(comparison_results, 
+      caption = "📊 Statistical Comparison by Repayment Status (T-Tests)")
+```
+
+
+```{r}
+# Load required libraries
+library(ggplot2)
+library(dplyr)
+
+# Read data
+data <- read.csv("car_loan_data_with_tenure.csv")
+
+# Convert salary_range to factor
+data$salary_range <- as.factor(data$salary_range)
+
+# ============================================
+# 1. BOX PLOT (Recommended)
+# ============================================
+ggplot(data, aes(x = salary_range, y = driver_tenure, fill = salary_range)) +
+  geom_boxplot() +
+  labs(title = "Driver Tenure by Salary Range",
+       x = "Salary Range",
+       y = "Driver Tenure (years)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# ============================================
+# 2. VIOLIN PLOT (Alternative)
+# ============================================
+ggplot(data, aes(x = salary_range, y = driver_tenure, fill = salary_range)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1, fill = "white") +
+  labs(title = "Driver Tenure Distribution by Salary Range",
+       x = "Salary Range",
+       y = "Driver Tenure (years)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# ============================================
+# 3. SUMMARY STATISTICS
+# ============================================
+summary_stats <- data %>%
+  group_by(salary_range) %>%
+  summarise(
+    Mean = mean(driver_tenure),
+    Median = median(driver_tenure),
+    SD = sd(driver_tenure),
+    Min = min(driver_tenure),
+    Max = max(driver_tenure),
+    Count = n()
+  )
+
+print(summary_stats)
+
+# ============================================
+# 4. ANOVA TEST
+# ============================================
+anova_result <- aov(driver_tenure ~ salary_range, data = data)
+summary(anova_result)
+
+# ============================================
+# 5. DENSITY PLOT (Overlay)
+# ============================================
+ggplot(data, aes(x = driver_tenure, fill = salary_range)) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Driver Tenure Density by Salary Range",
+       x = "Driver Tenure (years)",
+       y = "Density",
+       fill = "Salary Range") +
+  theme_minimal()
+
+```
+
+
+```{r}
+# Load required libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# Read data
+data <- read.csv("car_loan_data_with_tenure.csv")
+
+# Convert salary_range to factor
+data$salary_range <- as.factor(data$salary_range)
+
+# ============================================
+# 1. SUMMARY STATISTICS
+# ============================================
+summary_stats <- data %>%
+  group_by(salary_range) %>%
+  summarise(
+    Mean = mean(debt_to_income_ratio),
+    Median = median(debt_to_income_ratio),
+    SD = sd(debt_to_income_ratio),
+    Min = min(debt_to_income_ratio),
+    Max = max(debt_to_income_ratio),
+    Q1 = quantile(debt_to_income_ratio, 0.25),
+    Q3 = quantile(debt_to_income_ratio, 0.75),
+    Count = n()
+  )
+
+print(summary_stats)
+
+# ============================================
+# 2. BOX PLOT (推荐)
+# ============================================
+ggplot(data, aes(x = salary_range, y = debt_to_income_ratio, fill = salary_range)) +
+  geom_boxplot() +
+  labs(title = "债务收入比 by 工资等级",
+       subtitle = "Debt-to-Income Ratio by Salary Range",
+       x = "工资等级 (Salary Range)",
+       y = "债务收入比 (Debt-to-Income Ratio)") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5))
+
+# ============================================
+# 3. VIOLIN PLOT
+# ============================================
+ggplot(data, aes(x = salary_range, y = debt_to_income_ratio, fill = salary_range)) +
+  geom_violin(alpha = 0.7) +
+  geom_boxplot(width = 0.1, fill = "white", outlier.alpha = 0.3) +
+  labs(title = "债务收入比分布 by 工资等级",
+       x = "工资等级",
+       y = "债务收入比") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# ============================================
+# 4. DENSITY PLOT (Overlay)
+# ============================================
+ggplot(data, aes(x = debt_to_income_ratio, fill = salary_range)) +
+  geom_density(alpha = 0.5) +
+  labs(title = "债务收入比密度分布 by 工资等级",
+       x = "债务收入比",
+       y = "密度",
+       fill = "工资等级") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set2")
+
+# ============================================
+# 5. MEAN COMPARISON PLOT
+# ============================================
+mean_data <- data %>%
+  group_by(salary_range) %>%
+  summarise(
+    Mean = mean(debt_to_income_ratio),
+    SE = sd(debt_to_income_ratio) / sqrt(n())
+  )
+
+ggplot(mean_data, aes(x = salary_range, y = Mean, fill = salary_range)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), 
+                width = 0.2) +
+  labs(title = "DIR by Salary Range",
+       x = "Salary Range",
+       y = "DIR") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# ============================================
+# 6. ANOVA TEST
+# ============================================
+anova_result <- aov(debt_to_income_ratio ~ salary_range, data = data)
+summary(anova_result)
+
+# Post-hoc test (if ANOVA is significant)
+tukey_result <- TukeyHSD(anova_result)
+print(tukey_result)
+
+# ============================================
+# 7. CORRELATION (Spearman)
+# ============================================
+# Convert salary_range to numeric correlation analysis
+data$salary_range_numeric <- as.numeric(data$salary_range)
+cor_test <- cor.test(data$salary_range_numeric, 
+                     data$debt_to_income_ratio, 
+                     method = "spearman")
+print(cor_test)
+
+# ============================================
+# 8. SCATTER PLOT WITH JITTER
+# ============================================
+ggplot(data, aes(x = salary_range, y = debt_to_income_ratio, color = salary_range)) +
+  geom_jitter(alpha = 0.1, width = 0.3) +
+  geom_boxplot(alpha = 0.5, outlier.shape = NA) +
+  labs(title = "DIR by Salary Range",
+       x = "Salary Range",
+       y = "DIR") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# ============================================
+# 9. EFFECT SIZE (Cohen's d)
+# ============================================
+library(effsize)
+
+# 计算工资1级 vs 工资4级的效应量
+group1 <- data %>% filter(salary_range == 1) %>% pull(debt_to_income_ratio)
+group4 <- data %>% filter(salary_range == 4) %>% pull(debt_to_income_ratio)
+
+cohen_d <- cohen.d(group1, group4)
+print(cohen_d)
+
+# ============================================
+# 10. PERCENTAGE IN HIGH DEBT CATEGORY
+# ============================================
+# 定义高债务比 (>0.6)
+data <- data %>%
+  mutate(high_debt = ifelse(debt_to_income_ratio > 0.6, 1, 0))
+
+high_debt_pct <- data %>%
+  group_by(salary_range) %>%
+  summarise(
+    High_Debt_Pct = mean(high_debt) * 100,
+    Count = n()
+  )
+
+print(high_debt_pct)
+
+# 可视化
+ggplot(high_debt_pct, aes(x = salary_range, y = High_Debt_Pct, fill = salary_range)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = sprintf("%.1f%%", High_Debt_Pct)), 
+            vjust = -0.5) +
+  labs(title = "高债务比例 (>0.6) by 工资等级",
+       x = "工资等级",
+       y = "高债务比例 (%)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+```
+
+
+
+
+
+
+```{r}
+# 先确保所需包已加载
+library(ggplot2)
+library(gridExtra)
+library(knitr)   # kable 用到
+library(scales)  # percent
+
+# --- 预检查与安全转换 ---------------------------------------------------
+# 假设你的原表叫 data（如果不是，请改成实际名字）
+# 确保 categorical_vars 存在且包含要画的列名
+if(!exists("data")) stop("对象 'data' 未找到，请先加载数据到 data 变量。")
+if(!exists("categorical_vars")) {
+  # 例如自动检测（排除数值列）
+  categorical_vars <- names(data)[sapply(data, function(x) is.character(x) || is.factor(x))]
+}
+
+# 明确排除目标列 'repaid'（以防重复）
+categorical_vars <- setdiff(categorical_vars, "repaid")
+
+# 将所有分类列强制为 factor（安全）
+data[categorical_vars] <- lapply(data[categorical_vars], function(x) {
+  if(is.factor(x)) x else as.factor(x)
+})
+
+# 规范化目标列 repaid：确保为 factor，levels 为 "0","1" 或 "Not_Repaid","Repaid"
+if(!"repaid" %in% names(data)) stop("'repaid' 列不存在。")
+# 尽量支持多种原始格式
+if(is.numeric(data$repaid) || is.integer(data$repaid)) {
+  data$repaid <- factor(as.character(data$repaid), levels = c("0","1"))
+} else {
+  data$repaid <- as.factor(as.character(data$repaid))
+}
+# 如果要用友好的图例标签，建立显示层级和值的映射：
+# 找出当前 repaid 的实际 levels
+repay_levels <- levels(data$repaid)
+# 建立颜色映射，针对常见两个类自动处理
+fill_map <- list()
+if(all(c("0","1") %in% repay_levels)) {
+  fill_map <- c("0" = "salmon", "1" = "lightgreen")
+  fill_labels <- c("0" = "Not Repaid", "1" = "Repaid")
+} else if(all(c("Not_Repaid","Repaid") %in% repay_levels)) {
+  fill_map <- c("Not_Repaid" = "salmon", "Repaid" = "lightgreen")
+  fill_labels <- fill_map
+} else {
+  # fallback：按现有 levels 分配颜色
+  cols_use <- c("salmon","lightgreen","steelblue","orange")
+  fill_map <- setNames(cols_use[1:length(repay_levels)], repay_levels)
+  fill_labels <- setNames(repay_levels, repay_levels)
+}
+
+# --- 绘图（堆叠比例条形图） ----------------------------------------------
+plot_list_cat_target <- list()
+for(var in categorical_vars) {
+  # 跳过不存在或单一水平的列
+  if(!var %in% names(data)) next
+  if(nlevels(data[[var]]) < 2) next
+  
+  p <- ggplot(data, aes_string(x = var, fill = "repaid")) +
+    geom_bar(position = "fill", alpha = 0.85) +
+    scale_y_continuous(labels = percent_format()) +
+    labs(title = paste(var, "vs Loan Repayment"),
+         x = var, y = "Proportion", fill = "Repayment") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 35, hjust = 1),
+          plot.title = element_text(face = "bold", size = 12))
+  
+  # 只有当 fill_map 的 names 与 data$repaid levels 对应时才手动设色和标签
+  if(all(names(fill_map) %in% levels(data$repaid))) {
+    p <- p + scale_fill_manual(values = fill_map, labels = fill_labels)
+  }
+  
+  plot_list_cat_target[[var]] <- p
+}
+
+# 输出：若没有图则给提示
+if(length(plot_list_cat_target) == 0) {
+  message("没有可绘制的分类变量（或均为单一水平）。检查 categorical_vars 内容。")
+} else {
+  # 用 grid.arrange 分页显示（2列）
+  do.call(grid.arrange, c(plot_list_cat_target, ncol = 2,
+                          top = "Stacked Bar Charts: Categorical Variables vs Repayment"))
+}
+
+# --- 交叉表汇总（按行计算每个 category 的还款率） --------------------------
+cat("\n📊 Cross-Tabulation with Target Variable (repayment rate by group):\n\n")
+for(var in categorical_vars) {
+  if(!var %in% names(data)) next
+  if(nlevels(data[[var]]) < 2) next
+  
+  cat("-----", var, "-----\n")
+  # 按行（每个 category）计算 repaid 为 Repaid 的百分比
+  tab <- table(data[[var]], data$repaid)
+  prop_row <- prop.table(tab, margin = 1)  # 每行的比例
+  # 获取 repaid = positive level 名称（通常是 "1" 或 "Repaid"）
+  positive_level <- if("1" %in% colnames(prop_row)) "1" else tail(colnames(prop_row), 1)
+  # 输出表格（转为 %）
+  out_tbl <- round(prop_row[, , drop = FALSE] * 100, 1)
+  # 显示并用 kable 美化（如果在 notebook 中）
+  print(kable(out_tbl, caption = paste("Repayment % by", var)))
+  cat("\n")
+}
+
+
+
+```
+
+```{r}
+# ============================================================================
+# 10. CORRELATION ANALYSIS
+# ============================================================================
+
+# 加载
+library(corrplot)
+library(knitr)
+
+# Calculate correlation matrix
+cor_matrix <- cor(data[, numerical_vars], use = "complete.obs")
+
+# Visualize correlation matrix
+corrplot(cor_matrix, method = "color", type = "upper", 
+         addCoef.col = "black", number.cex = 0.8,
+         tl.col = "black", tl.srt = 45, tl.cex = 0.9,
+         title = "Correlation Matrix of Numerical Variables",
+         mar = c(0,0,2,0), col = colorRampPalette(c("pink", "white", "steelblue"))(200))
+
+# Print correlation matrix
+kable(round(cor_matrix, 3), caption = "Correlation Coefficients")
+
+# Detect high correlations
+high_cor <- which(abs(cor_matrix) > 0.7 & cor_matrix != 1, arr.ind = TRUE)
+
+if(nrow(high_cor) > 0) {
+  high_cor_df <- data.frame(
+    Variable_1 = rownames(cor_matrix)[high_cor[,1]],
+    Variable_2 = colnames(cor_matrix)[high_cor[,2]],
+    Correlation = round(cor_matrix[high_cor], 3)
+  )
+  kable(high_cor_df, caption = "⚠️ High Correlations (|r| > 0.7)")
+} else {
+  cat("\n✓ No high correlations detected (multicollinearity check passed)\n")
+}
+
+```
+
+```{r}
+
+###多重线性问题检验
+library(car)
+
+# 拟合模型
+model <- lm(repaid ~ car_value + debt_to_income_ratio + 
+            loan_length + driver_tenure + size_of_downpayment,
+            data = data)
+
+# 计算 VIF
+vif(model)
+
+#判断标准：
+#- VIF < 5: ✅ 可接受
+#- VIF 5-10: ⚠️ 中等共线性
+#- VIF > 10: 🚨 严重共线性
+
+#预期结果：
+#所有 VIF < 2（非常好）
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+# ============================================================================
+# 12. PRINCIPAL COMPONENT ANALYSIS (修正版)
+# ============================================================================
+cat("\n\n Starting PCA Analysis...\n")
+
+# ✅ 正确定义PCA变量
+pca_vars <- c("car_value", "debt_to_income_ratio", "loan_length", 
+              "driver_tenure", "size_of_downpayment")
+
+# 验证变量存在性
+cat("Variables for PCA:", paste(pca_vars, collapse = ", "), "\n")
+cat("Checking if all variables exist in data...\n")
+
+# 检查哪些变量实际存在
+existing_vars <- pca_vars[pca_vars %in% colnames(data)]
+missing_vars <- pca_vars[!pca_vars %in% colnames(data)]
+
+if(length(missing_vars) > 0) {
+  cat("⚠ Warning: Missing variables:", paste(missing_vars, collapse = ", "), "\n")
+  cat("Available variables:", paste(existing_vars, collapse = ", "), "\n")
+}
+
+# 只使用存在的变量
+pca_vars <- existing_vars
+
+# 移除零方差列
+vars_ok <- pca_vars[sapply(data[pca_vars], function(x) {
+  is.numeric(x) && var(x, na.rm = TRUE) > 0
+})]
+
+cat("Variables passing variance check:", paste(vars_ok, collapse = ", "), "\n")
+
+if(length(vars_ok) >= 2){
+  
+  cat("Performing PCA on", length(vars_ok), "numerical variables...\n\n")
+  
+  # 提取数据
+  pca_data <- data[, vars_ok, drop = FALSE]
+  
+  # 移除缺失值
+  pca_data <- pca_data[complete.cases(pca_data), ]
+  
+  # 验证数据类型
+  if(!all(sapply(pca_data, is.numeric))) {
+    stop("Non-numeric data detected in PCA input")
+  }
+  
+  # 执行PCA
+  pca <- prcomp(pca_data, center = TRUE, scale. = TRUE)
+  
+  # 计算解释方差
+  explained_var <- (pca$sdev^2) / sum(pca$sdev^2)
+  
+  cat("✓ PCA computation successful\n")
+  cat("  Total components:", length(explained_var), "\n")
+  cat("  PC1 variance:", round(explained_var[1]*100, 1), "%\n\n")
+  
+  # ========================================================================
+  # SCREE PLOT
+  # ========================================================================
+  
+  scree_data <- data.frame(
+    PC = 1:length(explained_var),
+    Variance = explained_var,
+    Cumulative = cumsum(explained_var)
+  )
+  
+  p_scree <- ggplot(scree_data, aes(x = PC)) +
+    geom_line(aes(y = Variance, color = "Individual"), linewidth = 1.2) +
+    geom_point(aes(y = Variance, color = "Individual"), size = 3) +
+    geom_line(aes(y = Cumulative, color = "Cumulative"), linewidth = 1.2) +
+    geom_point(aes(y = Cumulative, color = "Cumulative"), size = 3) +
+    geom_hline(yintercept = 0.8, linetype = "dashed", color = "gray50", linewidth = 0.8) +
+    scale_color_manual(
+      name = "Variance Type",
+      values = c("Individual" = "steelblue", "Cumulative" = "pink")
+    ) +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    scale_x_continuous(breaks = 1:length(explained_var)) +
+    labs(
+      title = "PCA Scree Plot",
+      subtitle = "Dashed line indicates 80% cumulative variance threshold",
+      x = "Principal Component",
+      y = "Proportion of Variance Explained"
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face = "bold", size = 14),
+      legend.position = "bottom"
+    )
+  
+  print(p_scree)
+  
+  # ========================================================================
+  # PC1 vs PC2 SCATTER PLOT
+  # ========================================================================
+  
+  # 提取前两个PC
+  n_pcs_plot <- min(2, ncol(pca$x))
+  pca_scores <- as.data.frame(pca$x[, 1:n_pcs_plot, drop = FALSE])
+  
+  # 添加目标变量 - 确保索引匹配
+  pca_scores$repaid <- factor(
+    data$repaid[complete.cases(data[, vars_ok])],
+    levels = c("0", "1"), 
+    labels = c("Not Repaid", "Repaid")
+  )
+  
+  # 移除缺失值
+  pca_scores <- pca_scores[complete.cases(pca_scores), ]
+  pca_scores$repaid <- droplevels(pca_scores$repaid)
+  
+  if(n_pcs_plot >= 2) {
+    p_pca <- ggplot(pca_scores, aes(x = PC1, y = PC2, color = repaid)) +
+      geom_point(alpha = 0.6, size = 2) +
+      scale_color_manual(
+        name = "Repayment Status",
+        values = c("Not Repaid" = "pink", "Repaid" = "steelblue")
+      ) +
+      labs(
+        title = "PCA: First Two Principal Components",
+        subtitle = paste0(
+          "PC1: ", round(explained_var[1]*100, 1), "% | ",
+          "PC2: ", round(explained_var[2]*100, 1), "% | ",
+          "Total: ", round(sum(explained_var[1:2])*100, 1), "%"
+        ),
+        x = paste0("PC1 (", round(explained_var[1]*100, 1), "%)"),
+        y = paste0("PC2 (", round(explained_var[2]*100, 1), "%)")
+      ) +
+      theme_minimal() +
+      theme(
+        plot.title = element_text(face = "bold", size = 14),
+        legend.position = "bottom"
+      )
+    
+    # 添加置信椭圆
+    group_counts <- table(pca_scores$repaid)
+    if(all(group_counts >= 3)) {
+      tryCatch({
+        p_pca <- p_pca + stat_ellipse(level = 0.95, linewidth = 1, linetype = "dashed")
+      }, error = function(e) {
+        cat("⚠ Could not add ellipses\n")
+      })
+    }
+    
+    print(p_pca)
+  }
+  
+  # ========================================================================
+  # LOADINGS TABLE
+  # ========================================================================
+  
+  n_components <- min(3, ncol(pca$rotation))
+  loadings_matrix <- pca$rotation[, 1:n_components, drop = FALSE]
+  loadings_df <- data.frame(
+    Variable = rownames(loadings_matrix),
+    stringsAsFactors = FALSE
+  )
+  
+  for(i in 1:n_components) {
+    loadings_df[[paste0("PC", i)]] <- loadings_matrix[, i]
+  }
+  
+  print(kable(loadings_df, digits = 3, caption = "PCA Loadings"))
+  
+  # ========================================================================
+  # VARIANCE EXPLAINED TABLE
+  # ========================================================================
+  
+  n_show <- min(5, length(explained_var))
+  variance_df <- data.frame(
+    Component = paste0("PC", 1:n_show),
+    Variance_Explained = paste0(round(explained_var[1:n_show]*100, 1), "%"),
+    Cumulative_Variance = paste0(round(cumsum(explained_var)[1:n_show]*100, 1), "%")
+  )
+  
+  print(kable(variance_df, caption = "Variance Explained Summary"))
+  
+  cat("\n✓ PCA analysis completed successfully\n\n")
+  
+} else {
+  cat("\n⚠ PCA skipped: Less than 2 numerical variables\n\n")
+}
+
+```
+
+
+
+
+
+
+```{r}
+# ============================================
+# 智能 t-SNE 分析（自动处理所有问题）
+# ============================================
+library(Rtsne)
+library(ggplot2)
+library(dplyr)
+
+# ---------------------------
+# 智能 t-SNE（含零方差保护 & PCA 降级改进）
+# ---------------------------
+
+numeric_features <- c("car_value","debt_to_income_ratio","loan_length","size_of_downpayment","driver_tenure")
+available_features <- numeric_features[numeric_features %in% names(data)]
+tsne_features <- data[ ,available_features, drop = FALSE]
+tsne_labels <- data$repaid
+
+# 强制数值
+for(col in names(tsne_features)) {
+  if(!is.numeric(tsne_features[[col]])) tsne_features[[col]] <- as.numeric(as.character(tsne_features[[col]]))
+}
+# 去掉全 NA 列（保险）
+tsne_features <- tsne_features[, colSums(!is.na(tsne_features)) > 0, drop = FALSE]
+
+# 完整行
+keep <- complete.cases(tsne_features)
+tsne_features <- tsne_features[keep, , drop = FALSE]
+tsne_labels <- tsne_labels[keep]
+
+n_total <- nrow(tsne_features)
+cat("Available features:", paste(colnames(tsne_features), collapse = ", "), "\n")
+cat("Complete cases:", n_total, "\n")
+
+# 如果样本极少，直接用 PCA（但先移除零方差列）
+if(n_total < 10) {
+  cat("⚠ Too few samples for meaningful t-SNE (n <", 10, "). Considering PCA fallback.\n")
+  # remove zero-variance columns
+  vars_var <- sapply(tsne_features, function(x) var(x, na.rm = TRUE))
+  keep_vars <- names(vars_var)[is.finite(vars_var) & vars_var > 0]
+  if(length(keep_vars) >= 2) {
+    cat("Variables used for PCA:", paste(keep_vars, collapse = ", "), "\n")
+    pca <- prcomp(scale(tsne_features[, keep_vars, drop = FALSE]), center = TRUE, scale. = TRUE)
+    pca_df <- as.data.frame(pca$x[,1:2])
+    pca_df$label <- factor(tsne_labels)
+    ggplot(pca_df, aes(x = PC1, y = PC2, color = label)) +
+      geom_point(alpha = 0.7) +
+      labs(title = "PCA (fallback) - first two PCs", x = "PC1", y = "PC2") +
+      theme_minimal()
+    stop("PCA fallback shown due to small sample size.")
+  } else if(length(keep_vars) == 1) {
+    single_var <- keep_vars[1]
+    cat("Only one non-constant numeric feature (", single_var, "). Showing histogram.\n", sep = "")
+    df <- data.frame(x = tsne_features[[single_var]], label = factor(tsne_labels))
+    ggplot(df, aes(x = x, fill = label)) +
+      geom_histogram(position = "identity", alpha = 0.5, bins = 30) +
+      labs(title = paste("Distribution of", single_var), x = single_var, y = "Count") +
+      theme_minimal()
+    stop("Single-var histogram shown due to small sample size and single variable.")
+  } else {
+    stop("No valid numeric features left for PCA/t-SNE after removing zero-variance or NA columns.")
+  }
+}
+
+# Remove zero-variance columns BEFORE scaling (this prevents prcomp/scale error)
+vars_var <- sapply(tsne_features, function(x) var(x, na.rm = TRUE))
+keep_vars <- names(vars_var)[is.finite(vars_var) & vars_var > 0]
+if(length(keep_vars) == 0) stop("No numeric features with positive variance available for t-SNE/PCA.")
+if(length(keep_vars) < length(colnames(tsne_features))) {
+  removed <- setdiff(colnames(tsne_features), keep_vars)
+  cat("Removed zero-variance columns:", paste(removed, collapse = ", "), "\n")
+}
+tsne_features <- tsne_features[, keep_vars, drop = FALSE]
+
+# 标准化（现在安全）
+tsne_data_scaled <- scale(tsne_features)
+
+# 去重处理（若存在重复）
+if(any(duplicated(as.data.frame(tsne_data_scaled)))) {
+  cat("⚠ Duplicated rows detected — adding tiny jitter to avoid Rtsne duplicate error.\n")
+  set.seed(42)
+  jitter_mat <- matrix(rnorm(length(tsne_data_scaled), sd = 1e-8), nrow = nrow(tsne_data_scaled))
+  tsne_data_scaled <- tsne_data_scaled + jitter_mat
+}
+
+# 参数选择
+DESIRED_PERPLEXITY <- 30
+max_perp_allowed <- floor((nrow(tsne_data_scaled) - 1) / 3)
+perp_init <- min(DESIRED_PERPLEXITY, max_perp_allowed)
+perp_init <- max(2, perp_init)  # at least 2
+
+cat(sprintf("n=%d -> max_perp_allowed=%d -> initial_perplexity=%d\n", nrow(tsne_data_scaled), max_perp_allowed, perp_init))
+
+perp_candidates <- unique(c(perp_init, 30, 20, 15, 10, 5))
+perp_candidates <- perp_candidates[perp_candidates <= max_perp_allowed & perp_candidates >= 2]
+if(length(perp_candidates) == 0) perp_candidates <- max(2, min(5, max_perp_allowed))
+
+# 尝试 t-SNE
+tsne_result <- NULL
+perplexity_value <- NA
+for(perp_try in perp_candidates) {
+  cat("Trying perplexity =", perp_try, "...\n")
+  try({
+    set.seed(123)
+    tsne_result_tmp <- Rtsne(
+      tsne_data_scaled,
+      dims = 2,
+      perplexity = perp_try,
+      verbose = FALSE,
+      max_iter = 1000,
+      check_duplicates = FALSE
+    )
+    if(!is.null(tsne_result_tmp$Y)) {
+      tsne_result <- tsne_result_tmp
+      perplexity_value <- perp_try
+      cat("✅ t-SNE succeeded with perplexity =", perp_try, "\n")
+      break
+    }
+  }, silent = TRUE)
+}
+
+# 若所有尝试失败，则降级到 PCA（并确保 PCA 输入无零方差）
+if(is.null(tsne_result)) {
+  cat("❌ All t-SNE attempts failed — falling back to PCA visualization.\n")
+  # PCA 所需变量检查（已经移除零方差，但再确认）
+  vars_var2 <- sapply(tsne_features, function(x) var(x, na.rm = TRUE))
+  keep_vars2 <- names(vars_var2)[is.finite(vars_var2) & vars_var2 > 0]
+  if(length(keep_vars2) >= 2) {
+    pca <- prcomp(scale(tsne_features[, keep_vars2, drop = FALSE]), center = TRUE, scale. = TRUE)
+    pca_df <- as.data.frame(pca$x[,1:2])
+    pca_df$label <- factor(tsne_labels)
+    ggplot(pca_df, aes(x = PC1, y = PC2, color = label)) +
+      geom_point(alpha = 0.7) +
+      labs(title = "PCA (fallback) - first two PCs", x = "PC1", y = "PC2") +
+      theme_minimal()
+  } else if(length(keep_vars2) == 1) {
+    single_var <- keep_vars2[1]
+    df <- data.frame(x = tsne_features[[single_var]], label = factor(tsne_labels))
+    ggplot(df, aes(x = x, fill = label)) +
+      geom_histogram(position = "identity", alpha = 0.5, bins = 30) +
+      labs(title = paste("Distribution of", single_var), x = single_var, y = "Count") +
+      theme_minimal()
+  } else {
+    stop("No valid numeric features left for PCA fallback.")
+  }
+} else {
+  # 成功绘图
+  tsne_df <- data.frame(
+    tSNE1 = tsne_result$Y[,1],
+    tSNE2 = tsne_result$Y[,2],
+    repaid = factor(tsne_labels, levels = c(0,1), labels = c("Not Repaid","Repaid"))
+  )
+  centroids <- tsne_df %>% group_by(repaid) %>%
+    summarise(n = n(), meanX = mean(tSNE1), meanY = mean(tSNE2), .groups = 'drop')
+  separation <- sqrt((centroids$meanX[1]-centroids$meanX[2])^2 + (centroids$meanY[1]-centroids$meanY[2])^2)
+
+  p <- ggplot(tsne_df, aes(x = tSNE1, y = tSNE2, color = repaid)) +
+    geom_point(alpha = 0.6, size = 1.8) +
+    stat_ellipse(level = 0.9, linetype = 2, linewidth = 0.6, show.legend = FALSE) +
+    scale_color_manual(values = c("Not Repaid" = "pink","Repaid" = "steelblue")) +
+    labs(title = "t-SNE Visualization", subtitle = sprintf("perplexity=%d | obs=%d | separation=%.2f", perplexity_value, nrow(tsne_df), separation)) +
+    theme_minimal()
+  print(p)
+
+  cat("Summary:\n")
+  print(centroids)
+  cat(sprintf("Centroid separation = %.3f\n", separation))
+}
+
+
+```
+

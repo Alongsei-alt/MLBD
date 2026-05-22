@@ -1,0 +1,2507 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Car Loan EDA Analysis},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Car Loan EDA Analysis}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# LOAD REQUIRED LIBRARIES}
+\CommentTok{\# ============================================================================}
+\FunctionTok{library}\NormalTok{(tidyverse)      }\CommentTok{\# Data manipulation and visualization}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
+## v dplyr     1.1.4     v readr     2.1.5
+## v forcats   1.0.0     v stringr   1.5.2
+## v ggplot2   4.0.0     v tibble    3.3.0
+## v lubridate 1.9.4     v tidyr     1.3.1
+## v purrr     1.1.0     
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+## i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(caret)          }\CommentTok{\# Data preprocessing}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: lattice
+## 
+## Attaching package: 'caret'
+## 
+## The following object is masked from 'package:purrr':
+## 
+##     lift
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(corrplot)       }\CommentTok{\# Correlation visualization}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## corrplot 0.95 loaded
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(gridExtra)      }\CommentTok{\# Arranging multiple plots}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'gridExtra'
+## 
+## The following object is masked from 'package:dplyr':
+## 
+##     combine
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(knitr)          }\CommentTok{\# Table formatting}
+\FunctionTok{install.packages}\NormalTok{(}\StringTok{"GGally"}\NormalTok{, }\AttributeTok{repos =} \StringTok{"https://cloud.r{-}project.org"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## The downloaded binary packages are in
+##  /var/folders/y_/k0znjv4d7n1gt4p__47j470h0000gn/T//Rtmpx3nrIx/downloaded_packages
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(GGally)         }\CommentTok{\# Advanced pair plots}
+
+\CommentTok{\# Set seed for reproducibility}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# 1. DATA LOADING AND INITIAL INSPECTION}
+\CommentTok{\# ============================================================================}
+
+\CommentTok{\# Load the dataset}
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"car\_loan\_data\_with\_tenure.csv"}\NormalTok{, }\AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}\NormalTok{)}
+
+\CommentTok{\# Display basic information}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Dataset Dimensions:"}\NormalTok{, }\FunctionTok{dim}\NormalTok{(data)[}\DecValTok{1}\NormalTok{], }\StringTok{"rows ×"}\NormalTok{, }\FunctionTok{dim}\NormalTok{(data)[}\DecValTok{2}\NormalTok{], }\StringTok{"columns}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Dataset Dimensions: 50000 rows × 8 columns
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Structure overview}
+\FunctionTok{str}\NormalTok{(data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    50000 obs. of  8 variables:
+##  $ car_value              : int  39811 12679 19847 22652 21268 13462 45775 10251 56481 20400 ...
+##  $ salary_range           : chr  "40K - 60K €" "40K - 60K €" "20K - 40K €" "20K - 40K €" ...
+##  $ debt_to_income_ratio   : num  0.633 0.719 0.722 0.706 0.672 ...
+##  $ loan_length            : int  19 7 17 16 21 19 20 9 13 17 ...
+##  $ repaid_loan_on_prev_car: logi  FALSE TRUE FALSE FALSE TRUE FALSE ...
+##  $ size_of_downpayment    : chr  "40%" "10%" "0%" "10%" ...
+##  $ driver_tenure          : num  0.213 4.928 0.521 0.454 5.695 ...
+##  $ repaid                 : int  1 0 1 1 1 1 0 1 1 0 ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# First few rows}
+\CommentTok{\# Load required package}
+\ControlFlowTok{if}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{require}\NormalTok{(knitr, }\AttributeTok{quietly =} \ConstantTok{TRUE}\NormalTok{)) \{}
+  \FunctionTok{install.packages}\NormalTok{(}\StringTok{"knitr"}\NormalTok{)}
+  \FunctionTok{library}\NormalTok{(knitr)}
+\NormalTok{\}}
+
+\CommentTok{\# Display first 5 rows with kable}
+\FunctionTok{print}\NormalTok{(}\FunctionTok{kable}\NormalTok{(}\FunctionTok{head}\NormalTok{(data, }\DecValTok{5}\NormalTok{), }
+            \AttributeTok{caption =} \StringTok{"First 5 Rows of Dataset"}\NormalTok{,}
+            \AttributeTok{format =} \StringTok{"simple"}\NormalTok{,}
+            \AttributeTok{align =} \StringTok{"c"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 
+## Table: First 5 Rows of Dataset
+## 
+##  car_value    salary_range    debt_to_income_ratio    loan_length    repaid_loan_on_prev_car    size_of_downpayment    driver_tenure    repaid 
+## -----------  --------------  ----------------------  -------------  -------------------------  ---------------------  ---------------  --------
+##    39811      40K - 60K €          0.6329502              19                  FALSE                     40%              0.2126533        1    
+##    12679      40K - 60K €          0.7186268               7                  TRUE                      10%              4.9275486        0    
+##    19847      20K - 40K €          0.7217235              17                  FALSE                     0%               0.5208167        1    
+##    22652      20K - 40K €          0.7059923              16                  FALSE                     10%              0.4536487        1    
+##    21268         60K+ €            0.6718880              21                  TRUE                      30%              5.6952630        1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Check for missing values}
+\NormalTok{missing\_summary }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Variable =} \FunctionTok{names}\NormalTok{(data),}
+  \AttributeTok{Missing\_Count =} \FunctionTok{colSums}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(data)),}
+  \AttributeTok{Missing\_Percent =} \FunctionTok{round}\NormalTok{(}\FunctionTok{colSums}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(data))}\SpecialCharTok{/}\FunctionTok{nrow}\NormalTok{(data)}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{2}\NormalTok{)}
+\NormalTok{)}
+
+\FunctionTok{kable}\NormalTok{(missing\_summary, }\AttributeTok{caption =} \StringTok{"Missing Values Summary"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3077}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3077}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1795}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2051}}@{}}
+\caption{Missing Values Summary}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Missing\_Count
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Missing\_Percent
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Missing\_Count
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Missing\_Percent
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+car\_value & car\_value & 0 & 0 \\
+salary\_range & salary\_range & 0 & 0 \\
+debt\_to\_income\_ratio & debt\_to\_income\_ratio & 0 & 0 \\
+loan\_length & loan\_length & 0 & 0 \\
+repaid\_loan\_on\_prev\_car & repaid\_loan\_on\_prev\_car & 0 & 0 \\
+size\_of\_downpayment & size\_of\_downpayment & 0 & 0 \\
+driver\_tenure & driver\_tenure & 0 & 0 \\
+repaid & repaid & 0 & 0 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# 2. DATA PREPARATION}
+\CommentTok{\# ============================================================================}
+
+\CommentTok{\# Convert categorical variables to factors}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{salary\_range }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{salary\_range)}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{repaid\_loan\_on\_prev\_car }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{repaid\_loan\_on\_prev\_car)}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{repaid }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{repaid)}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{size\_of\_downpayment }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{gsub}\NormalTok{(}\StringTok{"\%"}\NormalTok{, }\StringTok{""}\NormalTok{, data}\SpecialCharTok{$}\NormalTok{size\_of\_downpayment)) }\SpecialCharTok{/} \DecValTok{100}
+\CommentTok{\# Define variable types}
+\NormalTok{numerical\_vars }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"car\_value"}\NormalTok{, }\StringTok{"debt\_to\_income\_ratio"}\NormalTok{, }\StringTok{"loan\_length"}\NormalTok{, }\StringTok{"size\_of\_downpayment"}\NormalTok{,}\StringTok{"driver\_tenure"}\NormalTok{)}
+\NormalTok{categorical\_vars }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"salary\_range"}\NormalTok{, }\StringTok{"repaid\_loan\_on\_prev\_car"}\NormalTok{,  }\StringTok{"repaid"}\NormalTok{)}
+
+\CommentTok{\# Target variable distribution}
+\NormalTok{target\_dist }\OtherTok{\textless{}{-}} \FunctionTok{prop.table}\NormalTok{(}\FunctionTok{table}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{repaid))}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{📊 Target Variable Distribution:}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 📊 Target Variable Distribution:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"  Not Repaid (0):"}\NormalTok{, }\FunctionTok{round}\NormalTok{(target\_dist[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{), }\StringTok{"\%}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Not Repaid (0): 50 %
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"  Repaid (1):    "}\NormalTok{, }\FunctionTok{round}\NormalTok{(target\_dist[}\DecValTok{2}\NormalTok{]}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{), }\StringTok{"\%}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Repaid (1):     50 %
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# 3. DATA QUALITY SUMMARY}
+\CommentTok{\# ============================================================================}
+
+\NormalTok{quality\_report }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Metric =} \FunctionTok{c}\NormalTok{(}\StringTok{"Total Observations"}\NormalTok{, }\StringTok{"Total Variables"}\NormalTok{, }\StringTok{"Numerical Variables"}\NormalTok{, }
+             \StringTok{"Categorical Variables"}\NormalTok{, }\StringTok{"Missing Values"}\NormalTok{, }
+             \StringTok{"Class Imbalance Ratio"}\NormalTok{, }\StringTok{"Target: Not Repaid (\%)"}\NormalTok{, }\StringTok{"Target: Repaid (\%)"}\NormalTok{),}
+  \AttributeTok{Value =} \FunctionTok{c}\NormalTok{(}
+    \FunctionTok{nrow}\NormalTok{(data), }
+    \FunctionTok{ncol}\NormalTok{(data), }
+    \FunctionTok{length}\NormalTok{(numerical\_vars), }
+    \FunctionTok{length}\NormalTok{(categorical\_vars), }
+    \FunctionTok{sum}\NormalTok{(}\FunctionTok{colSums}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(data))),}
+    \FunctionTok{round}\NormalTok{(}\FunctionTok{max}\NormalTok{(target\_dist)}\SpecialCharTok{/}\FunctionTok{min}\NormalTok{(target\_dist), }\DecValTok{2}\NormalTok{),}
+    \FunctionTok{round}\NormalTok{(target\_dist[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{),}
+    \FunctionTok{round}\NormalTok{(target\_dist[}\DecValTok{2}\NormalTok{]}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{)}
+\NormalTok{  )}
+\NormalTok{)}
+
+\FunctionTok{kable}\NormalTok{(quality\_report, }\AttributeTok{caption =} \StringTok{"Data Quality Summary"}\NormalTok{, }\AttributeTok{align =} \StringTok{\textquotesingle{}lr\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\caption{Data Quality Summary}\tabularnewline
+\toprule\noalign{}
+Metric & Value \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Metric & Value \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Total Observations & 50000 \\
+Total Variables & 8 \\
+Numerical Variables & 5 \\
+Categorical Variables & 3 \\
+Missing Values & 0 \\
+Class Imbalance Ratio & 1 \\
+Target: Not Repaid (\%) & 50 \\
+Target: Repaid (\%) & 50 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# 4. NUMERICAL VARIABLES SUMMARY}
+\CommentTok{\# ============================================================================}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{=== 步骤4：数值型变量汇总统计 ===}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## === 步骤4：数值型变量汇总统计 ===
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 方法1：手动指定数值型变量（推荐 {-} 更明确）}
+\NormalTok{numerical\_vars }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+  \StringTok{"car\_value"}\NormalTok{, }
+  \StringTok{"debt\_to\_income\_ratio"}\NormalTok{, }
+  \StringTok{"loan\_length"}\NormalTok{, }
+  \StringTok{"driver\_tenure"}\NormalTok{,}
+  \StringTok{"size\_of\_downpayment"}
+\NormalTok{)}
+
+\CommentTok{\# 方法2：自动识别数值型变量（备选）}
+\CommentTok{\# numerical\_vars \textless{}{-} names(data)[sapply(data, is.numeric)]}
+
+\CommentTok{\# 验证数据类型}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{检查变量类型:}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 检查变量类型:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(data[numerical\_vars], class))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            car_value debt_to_income_ratio          loan_length 
+##            "integer"            "numeric"            "integer" 
+##        driver_tenure  size_of_downpayment 
+##            "numeric"            "numeric"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 创建汇总统计表}
+\NormalTok{summary\_stats }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Variable =}\NormalTok{ numerical\_vars,}
+  \AttributeTok{Mean =} \FunctionTok{round}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(data[numerical\_vars], mean, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{),}
+  \AttributeTok{Median =} \FunctionTok{round}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(data[numerical\_vars], median, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{),}
+  \AttributeTok{SD =} \FunctionTok{round}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(data[numerical\_vars], sd, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{),}
+  \AttributeTok{Min =} \FunctionTok{round}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(data[numerical\_vars], min, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{),}
+  \AttributeTok{Max =} \FunctionTok{round}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(data[numerical\_vars], max, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{),}
+  \AttributeTok{Q1 =} \FunctionTok{round}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(data[numerical\_vars], quantile, }\FloatTok{0.25}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{),}
+  \AttributeTok{Q3 =} \FunctionTok{round}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(data[numerical\_vars], quantile, }\FloatTok{0.75}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{)}
+\NormalTok{)}
+
+\CommentTok{\# 显示表格}
+\FunctionTok{kable}\NormalTok{(summary\_stats, }
+      \AttributeTok{caption =} \StringTok{"Summary Statistics for Numerical Variables"}\NormalTok{,}
+      \AttributeTok{align =} \StringTok{\textquotesingle{}c\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1842}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1930}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0877}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0877}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0877}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0877}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0965}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0877}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0877}}@{}}
+\caption{Summary Statistics for Numerical Variables}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Mean
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Median
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+SD
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Max
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Q1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Q3
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Mean
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Median
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+SD
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Max
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Q1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Q3
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+car\_value & car\_value & 29644.67 & 21904.00 & 20397.64 & 10011.00 &
+109564.00 & 14489.00 & 38394.25 \\
+debt\_to\_income\_ratio & debt\_to\_income\_ratio & 0.59 & 0.66 & 0.16 &
+0.26 & 0.73 & 0.47 & 0.71 \\
+loan\_length & loan\_length & 14.47 & 16.00 & 5.40 & 6.00 & 22.00 & 9.00
+& 19.00 \\
+driver\_tenure & driver\_tenure & 4.60 & 5.50 & 2.24 & 0.00 & 7.00 &
+2.97 & 6.47 \\
+size\_of\_downpayment & size\_of\_downpayment & 0.20 & 0.20 & 0.14 &
+0.00 & 0.40 & 0.10 & 0.30 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{✅ 数值型变量统计完成！}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ✅ 数值型变量统计完成！
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# 5. NUMERICAL VARIABLES DISTRIBUTIONS (改进版)}
+\CommentTok{\# ============================================================================}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(gridExtra)}
+
+\CommentTok{\# 确保只选择数值型变量}
+\NormalTok{numerical\_vars }\OtherTok{\textless{}{-}} \FunctionTok{names}\NormalTok{(data)[}\FunctionTok{sapply}\NormalTok{(data, is.numeric)]}
+
+\CommentTok{\# 数据验证和清理}
+\ControlFlowTok{for}\NormalTok{(var }\ControlFlowTok{in}\NormalTok{ numerical\_vars) \{}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{=== Checking"}\NormalTok{, var, }\StringTok{"===}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \FunctionTok{print}\NormalTok{(}\FunctionTok{summary}\NormalTok{(data[[var]]))}
+  \FunctionTok{print}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Range:"}\NormalTok{, }\FunctionTok{min}\NormalTok{(data[[var]], }\AttributeTok{na.rm=}\ConstantTok{TRUE}\NormalTok{), }\StringTok{"to"}\NormalTok{, }\FunctionTok{max}\NormalTok{(data[[var]], }\AttributeTok{na.rm=}\ConstantTok{TRUE}\NormalTok{)))}
+  \FunctionTok{print}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Unique values:"}\NormalTok{, }\FunctionTok{length}\NormalTok{(}\FunctionTok{unique}\NormalTok{(data[[var]]))))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## === Checking car_value ===
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   10011   14489   21904   29645   38394  109564 
+## [1] "Range: 10011 to 109564"
+## [1] "Unique values: 29712"
+## 
+## === Checking debt_to_income_ratio ===
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.2607  0.4721  0.6599  0.5856  0.7123  0.7321 
+## [1] "Range: 0.260749619 to 0.732118182"
+## [1] "Unique values: 49993"
+## 
+## === Checking loan_length ===
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    6.00    9.00   16.00   14.47   19.00   22.00 
+## [1] "Range: 6 to 22"
+## [1] "Unique values: 17"
+## 
+## === Checking size_of_downpayment ===
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.0000  0.1000  0.2000  0.1999  0.3000  0.4000 
+## [1] "Range: 0 to 0.4"
+## [1] "Unique values: 5"
+## 
+## === Checking driver_tenure ===
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## 0.002253 2.969400 5.499330 4.597473 6.470177 6.997167 
+## [1] "Range: 0.002253355 to 6.997167002"
+## [1] "Unique values: 50000"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Histograms}
+\NormalTok{plot\_list\_hist }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+
+\ControlFlowTok{for}\NormalTok{(var }\ControlFlowTok{in}\NormalTok{ numerical\_vars) \{}
+  \ControlFlowTok{if}\NormalTok{(}\FunctionTok{is.numeric}\NormalTok{(data[[var]]) }\SpecialCharTok{\&\&} \FunctionTok{length}\NormalTok{(}\FunctionTok{unique}\NormalTok{(data[[var]])) }\SpecialCharTok{\textgreater{}} \DecValTok{5}\NormalTok{) \{}
+    
+\NormalTok{    mean\_val }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(data[[var]], }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+    
+    \CommentTok{\# 特殊处理 debt\_to\_income\_ratio}
+    \ControlFlowTok{if}\NormalTok{(var }\SpecialCharTok{==} \StringTok{"debt\_to\_income\_ratio"}\NormalTok{) \{}
+      \CommentTok{\# 确保数据在 0{-}1 范围内}
+      \ControlFlowTok{if}\NormalTok{(}\FunctionTok{max}\NormalTok{(data[[var]], }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\textgreater{}} \DecValTok{1}\NormalTok{) \{}
+\NormalTok{        data[[var]] }\OtherTok{\textless{}{-}}\NormalTok{ data[[var]] }\SpecialCharTok{/} \DecValTok{100}
+\NormalTok{        mean\_val }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(data[[var]], }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+        \FunctionTok{message}\NormalTok{(}\StringTok{"Converted debt\_to\_income\_ratio to ratio scale"}\NormalTok{)}
+\NormalTok{      \}}
+      
+      \CommentTok{\# 设置合理的横轴范围}
+\NormalTok{      p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{x =}\NormalTok{ var)) }\SpecialCharTok{+}
+        \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{fill =} \StringTok{"steelblue"}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{, }\AttributeTok{bins =} \DecValTok{30}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+        \FunctionTok{geom\_vline}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ mean\_val), }
+                   \AttributeTok{color =} \StringTok{"red"}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }\AttributeTok{size =} \DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+        \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{breaks =} \FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{0.2}\NormalTok{)) }\SpecialCharTok{+}
+        \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Distribution of"}\NormalTok{, var),}
+             \AttributeTok{subtitle =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Mean:"}\NormalTok{, }\FunctionTok{round}\NormalTok{(mean\_val, }\DecValTok{2}\NormalTok{)),}
+             \AttributeTok{x =}\NormalTok{ var, }\AttributeTok{y =} \StringTok{"Frequency"}\NormalTok{) }\SpecialCharTok{+}
+        \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+        \FunctionTok{theme}\NormalTok{(}\AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{))}
+\NormalTok{    \} }\ControlFlowTok{else}\NormalTok{ \{}
+      \CommentTok{\# 其他变量正常绘制}
+\NormalTok{      p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{x =}\NormalTok{ var)) }\SpecialCharTok{+}
+        \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{fill =} \StringTok{"steelblue"}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{, }\AttributeTok{bins =} \DecValTok{30}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+        \FunctionTok{geom\_vline}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ mean\_val), }
+                   \AttributeTok{color =} \StringTok{"red"}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }\AttributeTok{size =} \DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+        \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Distribution of"}\NormalTok{, var),}
+             \AttributeTok{subtitle =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Mean:"}\NormalTok{, }\FunctionTok{round}\NormalTok{(mean\_val, }\DecValTok{2}\NormalTok{)),}
+             \AttributeTok{x =}\NormalTok{ var, }\AttributeTok{y =} \StringTok{"Frequency"}\NormalTok{) }\SpecialCharTok{+}
+        \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+        \FunctionTok{theme}\NormalTok{(}\AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{))}
+\NormalTok{    \}}
+    
+\NormalTok{    plot\_list\_hist[[var]] }\OtherTok{\textless{}{-}}\NormalTok{ p}
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+## i Please use tidy evaluation idioms with `aes()`.
+## i See also `vignette("ggplot2-in-packages")` for more information.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## i Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 绘制}
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(plot\_list\_hist) }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{) \{}
+  \FunctionTok{grid.arrange}\NormalTok{(}\AttributeTok{grobs =}\NormalTok{ plot\_list\_hist, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{, }
+               \AttributeTok{top =} \StringTok{"Histograms of Numerical Variables"}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 2 rows containing missing values or values outside the scale range
+## (`geom_bar()`).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 50000 rows containing missing values or values outside the scale range
+## (`geom_vline()`).
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-6-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# 5.1 Size\_Downpayment VARIABLES DISTRIBUTIONS}
+\CommentTok{\# ============================================================================}
+\FunctionTok{ls}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "categorical_vars" "data"             "mean_val"         "missing_summary" 
+##  [5] "numerical_vars"   "p"                "plot_list_hist"   "quality_report"  
+##  [9] "summary_stats"    "target_dist"      "var"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{factor}\NormalTok{(size\_of\_downpayment))) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{fill =} \StringTok{"steelblue"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.8}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Size of Downpayment"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Size of Downpayment"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Number"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-7-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# 6. OUTLIER DETECTION (IQR METHOD)}
+\CommentTok{\# ============================================================================}
+\CommentTok{\# Full script: Load {-}\textgreater{} Inspect {-}\textgreater{} Prepare {-}\textgreater{} Outlier detection (ignore size\_of\_downpayment)}
+\CommentTok{\# ============================================================================}
+
+\CommentTok{\# {-}{-}{-} 0. Setup {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(grid)}
+\FunctionTok{library}\NormalTok{(gridExtra)}
+\CommentTok{\# knitr::kable used for pretty tables if knitr available}
+\ControlFlowTok{if}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{requireNamespace}\NormalTok{(}\StringTok{"knitr"}\NormalTok{, }\AttributeTok{quietly =} \ConstantTok{TRUE}\NormalTok{)) \{}
+  \FunctionTok{message}\NormalTok{(}\StringTok{"knitr not installed — results will print as data.frames"}\NormalTok{)}
+\NormalTok{\}}
+
+\CommentTok{\# {-}{-}{-} 1. Load data {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{fname }\OtherTok{\textless{}{-}} \StringTok{"car\_loan\_data\_with\_tenure.csv"}
+\ControlFlowTok{if}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{file.exists}\NormalTok{(fname)) }\FunctionTok{stop}\NormalTok{(}\StringTok{"File not found: "}\NormalTok{, fname, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{Put the CSV in the working directory or change \textquotesingle{}fname\textquotesingle{}."}\NormalTok{)}
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(fname,}
+                 \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}\NormalTok{,}
+                 \AttributeTok{na.strings =} \FunctionTok{c}\NormalTok{(}\StringTok{""}\NormalTok{, }\StringTok{"NA"}\NormalTok{, }\StringTok{"N/A"}\NormalTok{),}
+                 \AttributeTok{strip.white =} \ConstantTok{TRUE}\NormalTok{,}
+                 \AttributeTok{fileEncoding =} \StringTok{"UTF{-}8"}\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Loaded dataset:"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(data), }\StringTok{"rows x"}\NormalTok{, }\FunctionTok{ncol}\NormalTok{(data), }\StringTok{"cols}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loaded dataset: 50000 rows x 8 cols
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# {-}{-}{-} 2. Quick structure \& head {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{{-}{-}{-} Structure {-}{-}{-}}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## --- Structure ---
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    50000 obs. of  8 variables:
+##  $ car_value              : int  39811 12679 19847 22652 21268 13462 45775 10251 56481 20400 ...
+##  $ salary_range           : chr  "40K - 60K €" "40K - 60K €" "20K - 40K €" "20K - 40K €" ...
+##  $ debt_to_income_ratio   : num  0.633 0.719 0.722 0.706 0.672 ...
+##  $ loan_length            : int  19 7 17 16 21 19 20 9 13 17 ...
+##  $ repaid_loan_on_prev_car: logi  FALSE TRUE FALSE FALSE TRUE FALSE ...
+##  $ size_of_downpayment    : chr  "40%" "10%" "0%" "10%" ...
+##  $ driver_tenure          : num  0.213 4.928 0.521 0.454 5.695 ...
+##  $ repaid                 : int  1 0 1 1 1 1 0 1 1 0 ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{{-}{-}{-} First 6 rows {-}{-}{-}}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## --- First 6 rows ---
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(}\FunctionTok{head}\NormalTok{(data, }\DecValTok{6}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   car_value salary_range debt_to_income_ratio loan_length
+## 1     39811  40K - 60K €            0.6329502          19
+## 2     12679  40K - 60K €            0.7186268           7
+## 3     19847  20K - 40K €            0.7217235          17
+## 4     22652  20K - 40K €            0.7059923          16
+## 5     21268       60K+ €            0.6718880          21
+## 6     13462  20K - 40K €            0.5832835          19
+##   repaid_loan_on_prev_car size_of_downpayment driver_tenure repaid
+## 1                   FALSE                 40%     0.2126533      1
+## 2                    TRUE                 10%     4.9275486      0
+## 3                   FALSE                  0%     0.5208167      1
+## 4                   FALSE                 10%     0.4536487      1
+## 5                    TRUE                 30%     5.6952630      1
+## 6                   FALSE                 30%     1.6902270      1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# {-}{-}{-} 3. Basic type conversions (keep minimal) {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\CommentTok{\# Make sure commonly used categorical columns are factors}
+\ControlFlowTok{if}\NormalTok{(}\StringTok{"salary\_range"} \SpecialCharTok{\%in\%} \FunctionTok{names}\NormalTok{(data)) data}\SpecialCharTok{$}\NormalTok{salary\_range }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{salary\_range)}
+\ControlFlowTok{if}\NormalTok{(}\StringTok{"repaid"} \SpecialCharTok{\%in\%} \FunctionTok{names}\NormalTok{(data)) data}\SpecialCharTok{$}\NormalTok{repaid }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{repaid))}
+\ControlFlowTok{if}\NormalTok{(}\StringTok{"repaid\_loan\_on\_prev\_car"} \SpecialCharTok{\%in\%} \FunctionTok{names}\NormalTok{(data)) data}\SpecialCharTok{$}\NormalTok{repaid\_loan\_on\_prev\_car }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{repaid\_loan\_on\_prev\_car))}
+
+\CommentTok{\# Note: we intentionally DO NOT convert/clean size\_of\_downpayment here because user asked to ignore it.}
+
+\CommentTok{\# {-}{-}{-} 4. Define numerical\_vars and explicitly remove size\_of\_downpayment {-}{-}{-}}
+\CommentTok{\# Auto{-}detect numeric columns then select the ones we want to analyse}
+\NormalTok{numerical\_vars }\OtherTok{\textless{}{-}} \FunctionTok{names}\NormalTok{(data)[}\FunctionTok{sapply}\NormalTok{(data, is.numeric)]}
+
+\CommentTok{\# Ensure typical expected numeric columns included (fallback)}
+\NormalTok{expected\_nums }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"car\_value"}\NormalTok{, }\StringTok{"debt\_to\_income\_ratio"}\NormalTok{, }\StringTok{"loan\_length"}\NormalTok{, }\StringTok{"driver\_tenure"}\NormalTok{, }\StringTok{"size\_of\_downpayment"}\NormalTok{)}
+\CommentTok{\# keep intersection but rely on detected numerics primarily}
+\NormalTok{numerical\_vars }\OtherTok{\textless{}{-}} \FunctionTok{intersect}\NormalTok{(numerical\_vars, expected\_nums)}
+
+\CommentTok{\# Remove size\_of\_downpayment as requested}
+\NormalTok{numerical\_vars }\OtherTok{\textless{}{-}} \FunctionTok{setdiff}\NormalTok{(numerical\_vars, }\StringTok{"size\_of\_downpayment"}\NormalTok{)}
+
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(numerical\_vars) }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\FunctionTok{stop}\NormalTok{(}\StringTok{"No numeric variables selected for analysis after excluding size\_of\_downpayment."}\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{Numeric variables to be analysed:}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Numeric variables to be analysed:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(numerical\_vars)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "car_value"            "debt_to_income_ratio" "loan_length"         
+## [4] "driver_tenure"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# {-}{-}{-} 5. Summary stats for chosen numeric vars {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{summary\_stats }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Variable =}\NormalTok{ numerical\_vars,}
+  \AttributeTok{Mean =} \FunctionTok{sapply}\NormalTok{(data[numerical\_vars], }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{round}\NormalTok{(}\FunctionTok{mean}\NormalTok{(x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{)),}
+  \AttributeTok{Median =} \FunctionTok{sapply}\NormalTok{(data[numerical\_vars], }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{round}\NormalTok{(}\FunctionTok{median}\NormalTok{(x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{)),}
+  \AttributeTok{SD =} \FunctionTok{sapply}\NormalTok{(data[numerical\_vars], }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{round}\NormalTok{(}\FunctionTok{sd}\NormalTok{(x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{)),}
+  \AttributeTok{Min =} \FunctionTok{sapply}\NormalTok{(data[numerical\_vars], }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{round}\NormalTok{(}\FunctionTok{min}\NormalTok{(x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{)),}
+  \AttributeTok{Q1 =} \FunctionTok{sapply}\NormalTok{(data[numerical\_vars], }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{round}\NormalTok{(}\FunctionTok{quantile}\NormalTok{(x, }\FloatTok{0.25}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{)),}
+  \AttributeTok{Q3 =} \FunctionTok{sapply}\NormalTok{(data[numerical\_vars], }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{round}\NormalTok{(}\FunctionTok{quantile}\NormalTok{(x, }\FloatTok{0.75}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{)),}
+  \AttributeTok{Max =} \FunctionTok{sapply}\NormalTok{(data[numerical\_vars], }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{round}\NormalTok{(}\FunctionTok{max}\NormalTok{(x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\DecValTok{2}\NormalTok{)),}
+  \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}
+\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{Summary statistics:}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Summary statistics:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{requireNamespace}\NormalTok{(}\StringTok{"knitr"}\NormalTok{, }\AttributeTok{quietly =} \ConstantTok{TRUE}\NormalTok{)) \{}
+  \FunctionTok{print}\NormalTok{(knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(summary\_stats, }\AttributeTok{caption =} \StringTok{"Summary Statistics for Numerical Variables"}\NormalTok{))}
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+  \FunctionTok{print}\NormalTok{(summary\_stats)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 
+## Table: Summary Statistics for Numerical Variables
+## 
+## |                     |Variable             |     Mean|   Median|       SD|      Min|       Q1|       Q3|       Max|
+## |:--------------------|:--------------------|--------:|--------:|--------:|--------:|--------:|--------:|---------:|
+## |car_value            |car_value            | 29644.67| 21904.00| 20397.64| 10011.00| 14489.00| 38394.25| 109564.00|
+## |debt_to_income_ratio |debt_to_income_ratio |     0.59|     0.66|     0.16|     0.26|     0.47|     0.71|      0.73|
+## |loan_length          |loan_length          |    14.47|    16.00|     5.40|     6.00|     9.00|    19.00|     22.00|
+## |driver_tenure        |driver_tenure        |     4.60|     5.50|     2.24|     0.00|     2.97|     6.47|      7.00|
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# {-}{-}{-} 6. Robust outlier detector {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{detect\_outliers }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x, }\AttributeTok{k =} \FloatTok{1.5}\NormalTok{) \{}
+  \CommentTok{\# Force numeric and remove NA}
+\NormalTok{  x\_num }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(x)}
+\NormalTok{  x\_num }\OtherTok{\textless{}{-}}\NormalTok{ x\_num[}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(x\_num)]}
+  \ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(x\_num) }\SpecialCharTok{\textless{}} \DecValTok{2}\NormalTok{) \{}
+    \FunctionTok{return}\NormalTok{(}\FunctionTok{list}\NormalTok{(}\AttributeTok{count =} \DecValTok{0}\NormalTok{, }\AttributeTok{percentage =} \DecValTok{0}\NormalTok{, }\AttributeTok{lower\_bound =} \ConstantTok{NA}\NormalTok{, }\AttributeTok{upper\_bound =} \ConstantTok{NA}\NormalTok{))}
+\NormalTok{  \}}
+\NormalTok{  Q1 }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(x\_num, }\FloatTok{0.25}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  Q3 }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(x\_num, }\FloatTok{0.75}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  IQRv }\OtherTok{\textless{}{-}}\NormalTok{ Q3 }\SpecialCharTok{{-}}\NormalTok{ Q1}
+\NormalTok{  lower\_bound }\OtherTok{\textless{}{-}}\NormalTok{ Q1 }\SpecialCharTok{{-}}\NormalTok{ k }\SpecialCharTok{*}\NormalTok{ IQRv}
+\NormalTok{  upper\_bound }\OtherTok{\textless{}{-}}\NormalTok{ Q3 }\SpecialCharTok{+}\NormalTok{ k }\SpecialCharTok{*}\NormalTok{ IQRv}
+\NormalTok{  outliers }\OtherTok{\textless{}{-}}\NormalTok{ (x\_num }\SpecialCharTok{\textless{}}\NormalTok{ lower\_bound) }\SpecialCharTok{|}\NormalTok{ (x\_num }\SpecialCharTok{\textgreater{}}\NormalTok{ upper\_bound)}
+  \FunctionTok{list}\NormalTok{(}
+    \AttributeTok{count =} \FunctionTok{sum}\NormalTok{(outliers, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+    \AttributeTok{percentage =} \FunctionTok{mean}\NormalTok{(outliers, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{*} \DecValTok{100}\NormalTok{,}
+    \AttributeTok{lower\_bound =} \FunctionTok{as.numeric}\NormalTok{(lower\_bound),}
+    \AttributeTok{upper\_bound =} \FunctionTok{as.numeric}\NormalTok{(upper\_bound)}
+\NormalTok{  )}
+\NormalTok{\}}
+
+\CommentTok{\# Prepare summary table}
+\NormalTok{outlier\_summary }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Variable =}\NormalTok{ numerical\_vars,}
+  \AttributeTok{Outlier\_Count =} \FunctionTok{integer}\NormalTok{(}\FunctionTok{length}\NormalTok{(numerical\_vars)),}
+  \AttributeTok{Outlier\_Percent =} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(numerical\_vars)),}
+  \AttributeTok{Lower\_Bound =} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(numerical\_vars)),}
+  \AttributeTok{Upper\_Bound =} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(numerical\_vars)),}
+  \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}
+\NormalTok{)}
+
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \FunctionTok{seq\_along}\NormalTok{(numerical\_vars)) \{}
+\NormalTok{  var }\OtherTok{\textless{}{-}}\NormalTok{ numerical\_vars[i]}
+\NormalTok{  info }\OtherTok{\textless{}{-}} \FunctionTok{tryCatch}\NormalTok{(}
+    \FunctionTok{detect\_outliers}\NormalTok{(data[[var]]),}
+    \AttributeTok{error =} \ControlFlowTok{function}\NormalTok{(e) }\FunctionTok{list}\NormalTok{(}\AttributeTok{count =} \ConstantTok{NA}\NormalTok{, }\AttributeTok{percentage =} \ConstantTok{NA}\NormalTok{, }\AttributeTok{lower\_bound =} \ConstantTok{NA}\NormalTok{, }\AttributeTok{upper\_bound =} \ConstantTok{NA}\NormalTok{)}
+\NormalTok{  )}
+\NormalTok{  outlier\_summary[i, }\StringTok{"Outlier\_Count"}\NormalTok{] }\OtherTok{\textless{}{-}}\NormalTok{ info}\SpecialCharTok{$}\NormalTok{count}
+\NormalTok{  outlier\_summary[i, }\StringTok{"Outlier\_Percent"}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(info}\SpecialCharTok{$}\NormalTok{percentage, }\DecValTok{2}\NormalTok{)}
+\NormalTok{  outlier\_summary[i, }\StringTok{"Lower\_Bound"}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(info}\SpecialCharTok{$}\NormalTok{lower\_bound), }\DecValTok{2}\NormalTok{)}
+\NormalTok{  outlier\_summary[i, }\StringTok{"Upper\_Bound"}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(info}\SpecialCharTok{$}\NormalTok{upper\_bound), }\DecValTok{2}\NormalTok{)}
+\NormalTok{\}}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{Outlier summary:}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Outlier summary:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{requireNamespace}\NormalTok{(}\StringTok{"knitr"}\NormalTok{, }\AttributeTok{quietly =} \ConstantTok{TRUE}\NormalTok{)) \{}
+  \FunctionTok{print}\NormalTok{(knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(outlier\_summary, }\AttributeTok{caption =} \StringTok{"🔍 Outlier Detection Results (IQR Method, k=1.5)"}\NormalTok{))}
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+  \FunctionTok{print}\NormalTok{(outlier\_summary)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 
+## Table: 🔍 Outlier Detection Results (IQR Method, k=1.5)
+## 
+## |Variable             | Outlier_Count| Outlier_Percent| Lower_Bound| Upper_Bound|
+## |:--------------------|-------------:|---------------:|-----------:|-----------:|
+## |car_value            |          2603|            5.21|   -21368.88|    74252.12|
+## |debt_to_income_ratio |             0|            0.00|        0.11|        1.07|
+## |loan_length          |             0|            0.00|       -6.00|       34.00|
+## |driver_tenure        |             0|            0.00|       -2.28|       11.72|
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# {-}{-}{-} 7. Boxplots for numeric vars {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{plot\_list\_box }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(var }\ControlFlowTok{in}\NormalTok{ numerical\_vars) \{}
+  \CommentTok{\# Use aes\_string for programmatic var mapping}
+\NormalTok{  p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{y =}\NormalTok{ var)) }\SpecialCharTok{+}
+    \FunctionTok{geom\_boxplot}\NormalTok{(}\AttributeTok{fill =} \StringTok{"lightblue"}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Boxplot of"}\NormalTok{, var), }\AttributeTok{y =}\NormalTok{ var) }\SpecialCharTok{+}
+    \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{))}
+\NormalTok{  plot\_list\_box[[var]] }\OtherTok{\textless{}{-}}\NormalTok{ p}
+\NormalTok{\}}
+
+\CommentTok{\# Arrange plots (2 columns)}
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(plot\_list\_box) }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{) \{}
+  \FunctionTok{do.call}\NormalTok{(grid.arrange, }\FunctionTok{c}\NormalTok{(plot\_list\_box, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{, }\AttributeTok{top =} \StringTok{"Boxplots for Outlier Detection"}\NormalTok{))}
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+  \FunctionTok{message}\NormalTok{(}\StringTok{"No boxplots to draw."}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-8-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# {-}{-}{-} End {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{Done. Note: \textquotesingle{}size\_of\_downpayment\textquotesingle{} has been excluded from numeric analysis as requested.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Done. Note: 'size_of_downpayment' has been excluded from numeric analysis as requested.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# 7. CATEGORICAL VARIABLES SUMMARY}
+\CommentTok{\# ============================================================================}
+
+\CommentTok{\# Summary table for categorical variables}
+\NormalTok{cat\_summary }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Variable =}\NormalTok{ categorical\_vars,}
+  \AttributeTok{N\_Categories =} \FunctionTok{sapply}\NormalTok{(data[categorical\_vars], }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{length}\NormalTok{(}\FunctionTok{unique}\NormalTok{(x))),}
+  \AttributeTok{Most\_Common =} \FunctionTok{sapply}\NormalTok{(data[categorical\_vars], }\ControlFlowTok{function}\NormalTok{(x) \{}
+\NormalTok{    tbl }\OtherTok{\textless{}{-}} \FunctionTok{table}\NormalTok{(x)}
+    \FunctionTok{names}\NormalTok{(tbl)[}\FunctionTok{which.max}\NormalTok{(tbl)]}
+\NormalTok{  \}),}
+  \AttributeTok{Most\_Common\_Freq =} \FunctionTok{sapply}\NormalTok{(data[categorical\_vars], }\ControlFlowTok{function}\NormalTok{(x) \{}
+\NormalTok{    tbl }\OtherTok{\textless{}{-}} \FunctionTok{table}\NormalTok{(x)}
+    \FunctionTok{max}\NormalTok{(tbl)}
+\NormalTok{  \}),}
+  \AttributeTok{Most\_Common\_Pct =} \FunctionTok{sapply}\NormalTok{(data[categorical\_vars], }\ControlFlowTok{function}\NormalTok{(x) \{}
+    \FunctionTok{round}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{prop.table}\NormalTok{(}\FunctionTok{table}\NormalTok{(x)))}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{)}
+\NormalTok{  \})}
+\NormalTok{)}
+
+\FunctionTok{kable}\NormalTok{(cat\_summary, }\AttributeTok{caption =} \StringTok{"📊 Categorical Variables Summary"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2264}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2264}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1226}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1132}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1604}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1509}}@{}}
+\caption{📊 Categorical Variables Summary}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+N\_Categories
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Most\_Common
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Most\_Common\_Freq
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Most\_Common\_Pct
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+N\_Categories
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Most\_Common
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Most\_Common\_Freq
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Most\_Common\_Pct
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+salary\_range & salary\_range & 4 & 0 - 20K € & 19613 & 39.2 \\
+repaid\_loan\_on\_prev\_car & repaid\_loan\_on\_prev\_car & 2 & TRUE &
+27547 & 55.1 \\
+repaid & repaid & 2 & 0 & 25021 & 50.0 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Bar plots}
+\NormalTok{plot\_list\_cat }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(var }\ControlFlowTok{in}\NormalTok{ categorical\_vars) \{}
+\NormalTok{  p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{x =}\NormalTok{ var)) }\SpecialCharTok{+}
+    \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{fill =} \StringTok{"steelblue"}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_text}\NormalTok{(}\AttributeTok{stat =} \StringTok{\textquotesingle{}count\textquotesingle{}}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{label =} \FunctionTok{after\_stat}\NormalTok{(count)), }
+              \AttributeTok{vjust =} \SpecialCharTok{{-}}\FloatTok{0.5}\NormalTok{, }\AttributeTok{size =} \FloatTok{3.5}\NormalTok{, }\AttributeTok{fontface =} \StringTok{"bold"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Distribution of"}\NormalTok{, var),}
+         \AttributeTok{x =}\NormalTok{ var, }\AttributeTok{y =} \StringTok{"Count"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{),}
+          \AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+\NormalTok{  plot\_list\_cat[[var]] }\OtherTok{\textless{}{-}}\NormalTok{ p}
+\NormalTok{\}}
+
+\FunctionTok{grid.arrange}\NormalTok{(}\AttributeTok{grobs =}\NormalTok{ plot\_list\_cat, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{, }
+             \AttributeTok{top =} \StringTok{"Bar Charts of Categorical Variables"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-9-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# 8. BIVARIATE ANALYSIS {-} NUMERICAL VS TARGET}
+\CommentTok{\# ============================================================================}
+
+\CommentTok{\# Violin plots with boxplots (combines density and boxplot)}
+\NormalTok{plot\_list\_violin }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(var }\ControlFlowTok{in}\NormalTok{ numerical\_vars) \{}
+\NormalTok{  p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{x =} \StringTok{"repaid"}\NormalTok{, }\AttributeTok{y =}\NormalTok{ var, }\AttributeTok{fill =} \StringTok{"repaid"}\NormalTok{)) }\SpecialCharTok{+}
+    \FunctionTok{geom\_violin}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{trim =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_boxplot}\NormalTok{(}\AttributeTok{width =} \FloatTok{0.2}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.8}\NormalTok{, }\AttributeTok{outlier.size =} \DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"0"} \OtherTok{=} \StringTok{"grey"}\NormalTok{, }\StringTok{"1"} \OtherTok{=} \StringTok{"lightblue"}\NormalTok{)) }\SpecialCharTok{+}
+    \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \FunctionTok{paste}\NormalTok{(var, }\StringTok{"by Loan Repayment Status"}\NormalTok{),}
+         \AttributeTok{x =} \StringTok{"Repaid"}\NormalTok{, }\AttributeTok{y =}\NormalTok{ var) }\SpecialCharTok{+}
+    \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{,}
+          \AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{))}
+\NormalTok{  plot\_list\_violin[[var]] }\OtherTok{\textless{}{-}}\NormalTok{ p}
+\NormalTok{\}}
+
+\FunctionTok{grid.arrange}\NormalTok{(}\AttributeTok{grobs =}\NormalTok{ plot\_list\_violin, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{, }
+             \AttributeTok{top =} \StringTok{"Violin Plots: Numerical Variables by Repayment Status"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-10-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Statistical comparison with t{-}tests}
+\NormalTok{comparison\_results }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Variable =}\NormalTok{ numerical\_vars,}
+  \AttributeTok{Mean\_NotRepaid =} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(numerical\_vars)),}
+  \AttributeTok{Mean\_Repaid =} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(numerical\_vars)),}
+  \AttributeTok{Difference =} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(numerical\_vars)),}
+  \AttributeTok{T\_Test\_PValue =} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(numerical\_vars)),}
+  \AttributeTok{Significant =} \FunctionTok{character}\NormalTok{(}\FunctionTok{length}\NormalTok{(numerical\_vars)),}
+  \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}
+\NormalTok{)}
+
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \FunctionTok{seq\_along}\NormalTok{(numerical\_vars)) \{}
+\NormalTok{  var }\OtherTok{\textless{}{-}}\NormalTok{ numerical\_vars[i]}
+\NormalTok{  mean\_0 }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(data[[var]][data}\SpecialCharTok{$}\NormalTok{repaid }\SpecialCharTok{==} \DecValTok{0}\NormalTok{], }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  mean\_1 }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(data[[var]][data}\SpecialCharTok{$}\NormalTok{repaid }\SpecialCharTok{==} \DecValTok{1}\NormalTok{], }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+  
+\NormalTok{  test\_result }\OtherTok{\textless{}{-}} \FunctionTok{t.test}\NormalTok{(data[[var]] }\SpecialCharTok{\textasciitilde{}}\NormalTok{ data}\SpecialCharTok{$}\NormalTok{repaid)}
+  
+\NormalTok{  comparison\_results[i, }\DecValTok{2}\SpecialCharTok{:}\DecValTok{6}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+    \FunctionTok{round}\NormalTok{(mean\_0, }\DecValTok{2}\NormalTok{),}
+    \FunctionTok{round}\NormalTok{(mean\_1, }\DecValTok{2}\NormalTok{),}
+    \FunctionTok{round}\NormalTok{(mean\_1 }\SpecialCharTok{{-}}\NormalTok{ mean\_0, }\DecValTok{2}\NormalTok{),}
+    \FunctionTok{round}\NormalTok{(test\_result}\SpecialCharTok{$}\NormalTok{p.value, }\DecValTok{4}\NormalTok{),}
+    \FunctionTok{ifelse}\NormalTok{(test\_result}\SpecialCharTok{$}\NormalTok{p.value }\SpecialCharTok{\textless{}} \FloatTok{0.05}\NormalTok{, }\StringTok{"✓ Yes"}\NormalTok{, }\StringTok{"✗ No"}\NormalTok{)}
+\NormalTok{  )}
+\NormalTok{\}}
+
+\FunctionTok{kable}\NormalTok{(comparison\_results, }
+      \AttributeTok{caption =} \StringTok{"📊 Statistical Comparison by Repayment Status (T{-}Tests)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2471}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1765}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1412}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1294}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1647}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1412}}@{}}
+\caption{📊 Statistical Comparison by Repayment Status
+(T-Tests)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Mean\_NotRepaid
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Mean\_Repaid
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Difference
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+T\_Test\_PValue
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Significant
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Mean\_NotRepaid
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Mean\_Repaid
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Difference
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+T\_Test\_PValue
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Significant
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+car\_value & 29012.07 & 30278.33 & 1266.26 & 0 & ✓ Yes \\
+debt\_to\_income\_ratio & 0.51 & 0.66 & 0.14 & 0 & ✓ Yes \\
+loan\_length & 12.36 & 16.58 & 4.22 & 0 & ✓ Yes \\
+driver\_tenure & 5.61 & 3.58 & -2.03 & 0 & ✓ Yes \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Load required libraries}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+
+\CommentTok{\# Read data}
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"car\_loan\_data\_with\_tenure.csv"}\NormalTok{)}
+
+\CommentTok{\# Convert salary\_range to factor}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{salary\_range }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{salary\_range)}
+
+\CommentTok{\# ============================================}
+\CommentTok{\# 1. BOX PLOT (Recommended)}
+\CommentTok{\# ============================================}
+\FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ salary\_range, }\AttributeTok{y =}\NormalTok{ driver\_tenure, }\AttributeTok{fill =}\NormalTok{ salary\_range)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Driver Tenure by Salary Range"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Salary Range"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"Driver Tenure (years)"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-11-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 2. VIOLIN PLOT (Alternative)}
+\CommentTok{\# ============================================}
+\FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ salary\_range, }\AttributeTok{y =}\NormalTok{ driver\_tenure, }\AttributeTok{fill =}\NormalTok{ salary\_range)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_violin}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\AttributeTok{width =} \FloatTok{0.1}\NormalTok{, }\AttributeTok{fill =} \StringTok{"white"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Driver Tenure Distribution by Salary Range"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Salary Range"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"Driver Tenure (years)"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-11-2.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 3. SUMMARY STATISTICS}
+\CommentTok{\# ============================================}
+\NormalTok{summary\_stats }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(salary\_range) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{Mean =} \FunctionTok{mean}\NormalTok{(driver\_tenure),}
+    \AttributeTok{Median =} \FunctionTok{median}\NormalTok{(driver\_tenure),}
+    \AttributeTok{SD =} \FunctionTok{sd}\NormalTok{(driver\_tenure),}
+    \AttributeTok{Min =} \FunctionTok{min}\NormalTok{(driver\_tenure),}
+    \AttributeTok{Max =} \FunctionTok{max}\NormalTok{(driver\_tenure),}
+    \AttributeTok{Count =} \FunctionTok{n}\NormalTok{()}
+\NormalTok{  )}
+
+\FunctionTok{print}\NormalTok{(summary\_stats)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 4 x 7
+##   salary_range  Mean Median    SD     Min   Max Count
+##   <fct>        <dbl>  <dbl> <dbl>   <dbl> <dbl> <int>
+## 1 0 - 20K €     5.34   6.04  1.77 0.0131   7.00 19613
+## 2 20K - 40K €   4.54   5.54  2.30 0.00225  7.00 15831
+## 3 40K - 60K €   3.93   4.54  2.31 0.00308  6.99  9751
+## 4 60K+ €        3.09   2.91  2.36 0.00303  6.99  4805
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 4. ANOVA }\AlertTok{TEST}
+\CommentTok{\# ============================================}
+\NormalTok{anova\_result }\OtherTok{\textless{}{-}} \FunctionTok{aov}\NormalTok{(driver\_tenure }\SpecialCharTok{\textasciitilde{}}\NormalTok{ salary\_range, }\AttributeTok{data =}\NormalTok{ data)}
+\FunctionTok{summary}\NormalTok{(anova\_result)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                 Df Sum Sq Mean Sq F value Pr(>F)    
+## salary_range     3  26184    8728    1943 <2e-16 ***
+## Residuals    49996 224629       4                   
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 5. DENSITY PLOT (Overlay)}
+\CommentTok{\# ============================================}
+\FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ driver\_tenure, }\AttributeTok{fill =}\NormalTok{ salary\_range)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_density}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Driver Tenure Density by Salary Range"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Driver Tenure (years)"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"Density"}\NormalTok{,}
+       \AttributeTok{fill =} \StringTok{"Salary Range"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-11-3.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Load required libraries}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\FunctionTok{library}\NormalTok{(tidyr)}
+
+\CommentTok{\# Read data}
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"car\_loan\_data\_with\_tenure.csv"}\NormalTok{)}
+
+\CommentTok{\# Convert salary\_range to factor}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{salary\_range }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{salary\_range)}
+
+\CommentTok{\# ============================================}
+\CommentTok{\# 1. SUMMARY STATISTICS}
+\CommentTok{\# ============================================}
+\NormalTok{summary\_stats }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(salary\_range) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{Mean =} \FunctionTok{mean}\NormalTok{(debt\_to\_income\_ratio),}
+    \AttributeTok{Median =} \FunctionTok{median}\NormalTok{(debt\_to\_income\_ratio),}
+    \AttributeTok{SD =} \FunctionTok{sd}\NormalTok{(debt\_to\_income\_ratio),}
+    \AttributeTok{Min =} \FunctionTok{min}\NormalTok{(debt\_to\_income\_ratio),}
+    \AttributeTok{Max =} \FunctionTok{max}\NormalTok{(debt\_to\_income\_ratio),}
+    \AttributeTok{Q1 =} \FunctionTok{quantile}\NormalTok{(debt\_to\_income\_ratio, }\FloatTok{0.25}\NormalTok{),}
+    \AttributeTok{Q3 =} \FunctionTok{quantile}\NormalTok{(debt\_to\_income\_ratio, }\FloatTok{0.75}\NormalTok{),}
+    \AttributeTok{Count =} \FunctionTok{n}\NormalTok{()}
+\NormalTok{  )}
+
+\FunctionTok{print}\NormalTok{(summary\_stats)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 4 x 9
+##   salary_range  Mean Median     SD   Min   Max    Q1    Q3 Count
+##   <fct>        <dbl>  <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl> <int>
+## 1 0 - 20K €    0.459  0.426 0.158  0.261 0.732 0.309 0.613 19613
+## 2 20K - 40K €  0.650  0.685 0.0912 0.261 0.732 0.620 0.714 15831
+## 3 40K - 60K €  0.679  0.706 0.0697 0.277 0.732 0.667 0.722  9751
+## 4 60K+ €       0.698  0.719 0.0556 0.296 0.732 0.695 0.727  4805
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 2. BOX PLOT (推荐)}
+\CommentTok{\# ============================================}
+\FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ salary\_range, }\AttributeTok{y =}\NormalTok{ debt\_to\_income\_ratio, }\AttributeTok{fill =}\NormalTok{ salary\_range)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"债务收入比 by 工资等级"}\NormalTok{,}
+       \AttributeTok{subtitle =} \StringTok{"Debt{-}to{-}Income Ratio by Salary Range"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"工资等级 (Salary Range)"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"债务收入比 (Debt{-}to{-}Income Ratio)"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{,}
+        \AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{hjust =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{face =} \StringTok{"bold"}\NormalTok{),}
+        \AttributeTok{plot.subtitle =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{hjust =} \FloatTok{0.5}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-12-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 3. VIOLIN PLOT}
+\CommentTok{\# ============================================}
+\FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ salary\_range, }\AttributeTok{y =}\NormalTok{ debt\_to\_income\_ratio, }\AttributeTok{fill =}\NormalTok{ salary\_range)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_violin}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\AttributeTok{width =} \FloatTok{0.1}\NormalTok{, }\AttributeTok{fill =} \StringTok{"white"}\NormalTok{, }\AttributeTok{outlier.alpha =} \FloatTok{0.3}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"债务收入比分布 by 工资等级"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"工资等级"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"债务收入比"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-12-2.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 4. DENSITY PLOT (Overlay)}
+\CommentTok{\# ============================================}
+\FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ debt\_to\_income\_ratio, }\AttributeTok{fill =}\NormalTok{ salary\_range)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_density}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"债务收入比密度分布 by 工资等级"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"债务收入比"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"密度"}\NormalTok{,}
+       \AttributeTok{fill =} \StringTok{"工资等级"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Set2"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-12-3.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 5. MEAN COMPARISON PLOT}
+\CommentTok{\# ============================================}
+\NormalTok{mean\_data }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(salary\_range) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{Mean =} \FunctionTok{mean}\NormalTok{(debt\_to\_income\_ratio),}
+    \AttributeTok{SE =} \FunctionTok{sd}\NormalTok{(debt\_to\_income\_ratio) }\SpecialCharTok{/} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{n}\NormalTok{())}
+\NormalTok{  )}
+
+\FunctionTok{ggplot}\NormalTok{(mean\_data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ salary\_range, }\AttributeTok{y =}\NormalTok{ Mean, }\AttributeTok{fill =}\NormalTok{ salary\_range)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_errorbar}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{ymin =}\NormalTok{ Mean }\SpecialCharTok{{-}}\NormalTok{ SE, }\AttributeTok{ymax =}\NormalTok{ Mean }\SpecialCharTok{+}\NormalTok{ SE), }
+                \AttributeTok{width =} \FloatTok{0.2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"DIR by Salary Range"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Salary Range"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"DIR"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-12-4.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 6. ANOVA }\AlertTok{TEST}
+\CommentTok{\# ============================================}
+\NormalTok{anova\_result }\OtherTok{\textless{}{-}} \FunctionTok{aov}\NormalTok{(debt\_to\_income\_ratio }\SpecialCharTok{\textasciitilde{}}\NormalTok{ salary\_range, }\AttributeTok{data =}\NormalTok{ data)}
+\FunctionTok{summary}\NormalTok{(anova\_result)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                 Df Sum Sq Mean Sq F value Pr(>F)    
+## salary_range     3  524.0  174.67   12812 <2e-16 ***
+## Residuals    49996  681.6    0.01                   
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Post{-}hoc test (if ANOVA is significant)}
+\NormalTok{tukey\_result }\OtherTok{\textless{}{-}} \FunctionTok{TukeyHSD}\NormalTok{(anova\_result)}
+\FunctionTok{print}\NormalTok{(tukey\_result)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Tukey multiple comparisons of means
+##     95% family-wise confidence level
+## 
+## Fit: aov(formula = debt_to_income_ratio ~ salary_range, data = data)
+## 
+## $salary_range
+##                               diff        lwr        upr p adj
+## 20K - 40K €-0 - 20K €   0.19091920 0.18771428 0.19412411     0
+## 40K - 60K €-0 - 20K €   0.21960946 0.21589255 0.22332637     0
+## 60K+ €-0 - 20K €        0.23818674 0.23335829 0.24301519     0
+## 40K - 60K €-20K - 40K € 0.02869026 0.02482873 0.03255179     0
+## 60K+ €-20K - 40K €      0.04726754 0.04232690 0.05220818     0
+## 60K+ €-40K - 60K €      0.01857728 0.01329013 0.02386442     0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 7. CORRELATION (Spearman)}
+\CommentTok{\# ============================================}
+\CommentTok{\# Convert salary\_range to numeric correlation analysis}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{salary\_range\_numeric }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{salary\_range)}
+\NormalTok{cor\_test }\OtherTok{\textless{}{-}} \FunctionTok{cor.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{salary\_range\_numeric, }
+\NormalTok{                     data}\SpecialCharTok{$}\NormalTok{debt\_to\_income\_ratio, }
+                     \AttributeTok{method =} \StringTok{"spearman"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in cor.test.default(data$salary_range_numeric,
+## data$debt_to_income_ratio, : Cannot compute exact p-value with ties
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(cor\_test)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Spearman's rank correlation rho
+## 
+## data:  data$salary_range_numeric and data$debt_to_income_ratio
+## S = 7.7902e+12, p-value < 2.2e-16
+## alternative hypothesis: true rho is not equal to 0
+## sample estimates:
+##       rho 
+## 0.6260718
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 8. SCATTER PLOT WITH JITTER}
+\CommentTok{\# ============================================}
+\FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ salary\_range, }\AttributeTok{y =}\NormalTok{ debt\_to\_income\_ratio, }\AttributeTok{color =}\NormalTok{ salary\_range)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_jitter}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.1}\NormalTok{, }\AttributeTok{width =} \FloatTok{0.3}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{outlier.shape =} \ConstantTok{NA}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"DIR by Salary Range"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Salary Range"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"DIR"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-12-5.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 9. EFFECT SIZE (Cohen\textquotesingle{}s d)}
+\CommentTok{\# ============================================}
+\FunctionTok{library}\NormalTok{(effsize)}
+
+\CommentTok{\# 计算工资1级 vs 工资4级的效应量}
+\NormalTok{group1 }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(salary\_range }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(debt\_to\_income\_ratio)}
+\NormalTok{group4 }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(salary\_range }\SpecialCharTok{==} \DecValTok{4}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(debt\_to\_income\_ratio)}
+
+\NormalTok{cohen\_d }\OtherTok{\textless{}{-}} \FunctionTok{cohen.d}\NormalTok{(group1, group4)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in qt((1 - conf.level)/2, df): NaNs produced
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(cohen\_d)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Cohen's d
+## 
+## d estimate: NaN (NA)
+## 95 percent confidence interval:
+## lower upper 
+##   NaN   NaN
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 10. PERCENTAGE IN HIGH DEBT CATEGORY}
+\CommentTok{\# ============================================}
+\CommentTok{\# 定义高债务比 (\textgreater{}0.6)}
+\NormalTok{data }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{high\_debt =} \FunctionTok{ifelse}\NormalTok{(debt\_to\_income\_ratio }\SpecialCharTok{\textgreater{}} \FloatTok{0.6}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{))}
+
+\NormalTok{high\_debt\_pct }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(salary\_range) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{High\_Debt\_Pct =} \FunctionTok{mean}\NormalTok{(high\_debt) }\SpecialCharTok{*} \DecValTok{100}\NormalTok{,}
+    \AttributeTok{Count =} \FunctionTok{n}\NormalTok{()}
+\NormalTok{  )}
+
+\FunctionTok{print}\NormalTok{(high\_debt\_pct)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 4 x 3
+##   salary_range High_Debt_Pct Count
+##   <fct>                <dbl> <int>
+## 1 0 - 20K €             26.8 19613
+## 2 20K - 40K €           79.5 15831
+## 3 40K - 60K €           88.8  9751
+## 4 60K+ €                94.4  4805
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 可视化}
+\FunctionTok{ggplot}\NormalTok{(high\_debt\_pct, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ salary\_range, }\AttributeTok{y =}\NormalTok{ High\_Debt\_Pct, }\AttributeTok{fill =}\NormalTok{ salary\_range)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{label =} \FunctionTok{sprintf}\NormalTok{(}\StringTok{"\%.1f\%\%"}\NormalTok{, High\_Debt\_Pct)), }
+            \AttributeTok{vjust =} \SpecialCharTok{{-}}\FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"高债务比例 (\textgreater{}0.6) by 工资等级"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"工资等级"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"高债务比例 (\%)"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-12-6.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 先确保所需包已加载}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(gridExtra)}
+\FunctionTok{library}\NormalTok{(knitr)   }\CommentTok{\# kable 用到}
+\FunctionTok{library}\NormalTok{(scales)  }\CommentTok{\# percent}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'scales'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:purrr':
+## 
+##     discard
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:readr':
+## 
+##     col_factor
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# {-}{-}{-} 预检查与安全转换 {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\CommentTok{\# 假设你的原表叫 data（如果不是，请改成实际名字）}
+\CommentTok{\# 确保 categorical\_vars 存在且包含要画的列名}
+\ControlFlowTok{if}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{exists}\NormalTok{(}\StringTok{"data"}\NormalTok{)) }\FunctionTok{stop}\NormalTok{(}\StringTok{"对象 \textquotesingle{}data\textquotesingle{} 未找到，请先加载数据到 data 变量。"}\NormalTok{)}
+\ControlFlowTok{if}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{exists}\NormalTok{(}\StringTok{"categorical\_vars"}\NormalTok{)) \{}
+  \CommentTok{\# 例如自动检测（排除数值列）}
+\NormalTok{  categorical\_vars }\OtherTok{\textless{}{-}} \FunctionTok{names}\NormalTok{(data)[}\FunctionTok{sapply}\NormalTok{(data, }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{is.character}\NormalTok{(x) }\SpecialCharTok{||} \FunctionTok{is.factor}\NormalTok{(x))]}
+\NormalTok{\}}
+
+\CommentTok{\# 明确排除目标列 \textquotesingle{}repaid\textquotesingle{}（以防重复）}
+\NormalTok{categorical\_vars }\OtherTok{\textless{}{-}} \FunctionTok{setdiff}\NormalTok{(categorical\_vars, }\StringTok{"repaid"}\NormalTok{)}
+
+\CommentTok{\# 将所有分类列强制为 factor（安全）}
+\NormalTok{data[categorical\_vars] }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(data[categorical\_vars], }\ControlFlowTok{function}\NormalTok{(x) \{}
+  \ControlFlowTok{if}\NormalTok{(}\FunctionTok{is.factor}\NormalTok{(x)) x }\ControlFlowTok{else} \FunctionTok{as.factor}\NormalTok{(x)}
+\NormalTok{\})}
+
+\CommentTok{\# 规范化目标列 repaid：确保为 factor，levels 为 "0","1" 或 "Not\_Repaid","Repaid"}
+\ControlFlowTok{if}\NormalTok{(}\SpecialCharTok{!}\StringTok{"repaid"} \SpecialCharTok{\%in\%} \FunctionTok{names}\NormalTok{(data)) }\FunctionTok{stop}\NormalTok{(}\StringTok{"\textquotesingle{}repaid\textquotesingle{} 列不存在。"}\NormalTok{)}
+\CommentTok{\# 尽量支持多种原始格式}
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{is.numeric}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{repaid) }\SpecialCharTok{||} \FunctionTok{is.integer}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{repaid)) \{}
+\NormalTok{  data}\SpecialCharTok{$}\NormalTok{repaid }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{repaid), }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\StringTok{"0"}\NormalTok{,}\StringTok{"1"}\NormalTok{))}
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{  data}\SpecialCharTok{$}\NormalTok{repaid }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{repaid))}
+\NormalTok{\}}
+\CommentTok{\# 如果要用友好的图例标签，建立显示层级和值的映射：}
+\CommentTok{\# 找出当前 repaid 的实际 levels}
+\NormalTok{repay\_levels }\OtherTok{\textless{}{-}} \FunctionTok{levels}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{repaid)}
+\CommentTok{\# 建立颜色映射，针对常见两个类自动处理}
+\NormalTok{fill\_map }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{all}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"0"}\NormalTok{,}\StringTok{"1"}\NormalTok{) }\SpecialCharTok{\%in\%}\NormalTok{ repay\_levels)) \{}
+\NormalTok{  fill\_map }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"0"} \OtherTok{=} \StringTok{"salmon"}\NormalTok{, }\StringTok{"1"} \OtherTok{=} \StringTok{"lightgreen"}\NormalTok{)}
+\NormalTok{  fill\_labels }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"0"} \OtherTok{=} \StringTok{"Not Repaid"}\NormalTok{, }\StringTok{"1"} \OtherTok{=} \StringTok{"Repaid"}\NormalTok{)}
+\NormalTok{\} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{(}\FunctionTok{all}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"Not\_Repaid"}\NormalTok{,}\StringTok{"Repaid"}\NormalTok{) }\SpecialCharTok{\%in\%}\NormalTok{ repay\_levels)) \{}
+\NormalTok{  fill\_map }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Not\_Repaid"} \OtherTok{=} \StringTok{"salmon"}\NormalTok{, }\StringTok{"Repaid"} \OtherTok{=} \StringTok{"lightgreen"}\NormalTok{)}
+\NormalTok{  fill\_labels }\OtherTok{\textless{}{-}}\NormalTok{ fill\_map}
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+  \CommentTok{\# fallback：按现有 levels 分配颜色}
+\NormalTok{  cols\_use }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"salmon"}\NormalTok{,}\StringTok{"lightgreen"}\NormalTok{,}\StringTok{"steelblue"}\NormalTok{,}\StringTok{"orange"}\NormalTok{)}
+\NormalTok{  fill\_map }\OtherTok{\textless{}{-}} \FunctionTok{setNames}\NormalTok{(cols\_use[}\DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(repay\_levels)], repay\_levels)}
+\NormalTok{  fill\_labels }\OtherTok{\textless{}{-}} \FunctionTok{setNames}\NormalTok{(repay\_levels, repay\_levels)}
+\NormalTok{\}}
+
+\CommentTok{\# {-}{-}{-} 绘图（堆叠比例条形图） {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{plot\_list\_cat\_target }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(var }\ControlFlowTok{in}\NormalTok{ categorical\_vars) \{}
+  \CommentTok{\# 跳过不存在或单一水平的列}
+  \ControlFlowTok{if}\NormalTok{(}\SpecialCharTok{!}\NormalTok{var }\SpecialCharTok{\%in\%} \FunctionTok{names}\NormalTok{(data)) }\ControlFlowTok{next}
+  \ControlFlowTok{if}\NormalTok{(}\FunctionTok{nlevels}\NormalTok{(data[[var]]) }\SpecialCharTok{\textless{}} \DecValTok{2}\NormalTok{) }\ControlFlowTok{next}
+  
+\NormalTok{  p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{x =}\NormalTok{ var, }\AttributeTok{fill =} \StringTok{"repaid"}\NormalTok{)) }\SpecialCharTok{+}
+    \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{position =} \StringTok{"fill"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.85}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{percent\_format}\NormalTok{()) }\SpecialCharTok{+}
+    \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \FunctionTok{paste}\NormalTok{(var, }\StringTok{"vs Loan Repayment"}\NormalTok{),}
+         \AttributeTok{x =}\NormalTok{ var, }\AttributeTok{y =} \StringTok{"Proportion"}\NormalTok{, }\AttributeTok{fill =} \StringTok{"Repayment"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{35}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{),}
+          \AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{, }\AttributeTok{size =} \DecValTok{12}\NormalTok{))}
+  
+  \CommentTok{\# 只有当 fill\_map 的 names 与 data$repaid levels 对应时才手动设色和标签}
+  \ControlFlowTok{if}\NormalTok{(}\FunctionTok{all}\NormalTok{(}\FunctionTok{names}\NormalTok{(fill\_map) }\SpecialCharTok{\%in\%} \FunctionTok{levels}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{repaid))) \{}
+\NormalTok{    p }\OtherTok{\textless{}{-}}\NormalTok{ p }\SpecialCharTok{+} \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =}\NormalTok{ fill\_map, }\AttributeTok{labels =}\NormalTok{ fill\_labels)}
+\NormalTok{  \}}
+  
+\NormalTok{  plot\_list\_cat\_target[[var]] }\OtherTok{\textless{}{-}}\NormalTok{ p}
+\NormalTok{\}}
+
+\CommentTok{\# 输出：若没有图则给提示}
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(plot\_list\_cat\_target) }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) \{}
+  \FunctionTok{message}\NormalTok{(}\StringTok{"没有可绘制的分类变量（或均为单一水平）。检查 categorical\_vars 内容。"}\NormalTok{)}
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+  \CommentTok{\# 用 grid.arrange 分页显示（2列）}
+  \FunctionTok{do.call}\NormalTok{(grid.arrange, }\FunctionTok{c}\NormalTok{(plot\_list\_cat\_target, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{,}
+                          \AttributeTok{top =} \StringTok{"Stacked Bar Charts: Categorical Variables vs Repayment"}\NormalTok{))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-13-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# {-}{-}{-} 交叉表汇总（按行计算每个 category 的还款率） {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{📊 Cross{-}Tabulation with Target Variable (repayment rate by group):}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 📊 Cross-Tabulation with Target Variable (repayment rate by group):
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{(var }\ControlFlowTok{in}\NormalTok{ categorical\_vars) \{}
+  \ControlFlowTok{if}\NormalTok{(}\SpecialCharTok{!}\NormalTok{var }\SpecialCharTok{\%in\%} \FunctionTok{names}\NormalTok{(data)) }\ControlFlowTok{next}
+  \ControlFlowTok{if}\NormalTok{(}\FunctionTok{nlevels}\NormalTok{(data[[var]]) }\SpecialCharTok{\textless{}} \DecValTok{2}\NormalTok{) }\ControlFlowTok{next}
+  
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"{-}{-}{-}{-}{-}"}\NormalTok{, var, }\StringTok{"{-}{-}{-}{-}{-}}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \CommentTok{\# 按行（每个 category）计算 repaid 为 Repaid 的百分比}
+\NormalTok{  tab }\OtherTok{\textless{}{-}} \FunctionTok{table}\NormalTok{(data[[var]], data}\SpecialCharTok{$}\NormalTok{repaid)}
+\NormalTok{  prop\_row }\OtherTok{\textless{}{-}} \FunctionTok{prop.table}\NormalTok{(tab, }\AttributeTok{margin =} \DecValTok{1}\NormalTok{)  }\CommentTok{\# 每行的比例}
+  \CommentTok{\# 获取 repaid = positive level 名称（通常是 "1" 或 "Repaid"）}
+\NormalTok{  positive\_level }\OtherTok{\textless{}{-}} \ControlFlowTok{if}\NormalTok{(}\StringTok{"1"} \SpecialCharTok{\%in\%} \FunctionTok{colnames}\NormalTok{(prop\_row)) }\StringTok{"1"} \ControlFlowTok{else} \FunctionTok{tail}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(prop\_row), }\DecValTok{1}\NormalTok{)}
+  \CommentTok{\# 输出表格（转为 \%）}
+\NormalTok{  out\_tbl }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(prop\_row[, , }\AttributeTok{drop =} \ConstantTok{FALSE}\NormalTok{] }\SpecialCharTok{*} \DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{)}
+  \CommentTok{\# 显示并用 kable 美化（如果在 notebook 中）}
+  \FunctionTok{print}\NormalTok{(}\FunctionTok{kable}\NormalTok{(out\_tbl, }\AttributeTok{caption =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Repayment \% by"}\NormalTok{, var)))}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## ----- salary_range -----
+## 
+## 
+## Table: Repayment % by salary_range
+## 
+## |            |    0|    1|
+## |:-----------|----:|----:|
+## |0 - 20K €   | 73.9| 26.1|
+## |20K - 40K € | 35.0| 65.0|
+## |40K - 60K € | 33.8| 66.2|
+## |60K+ €      | 35.3| 64.7|
+## 
+## ----- repaid_loan_on_prev_car -----
+## 
+## 
+## Table: Repayment % by repaid_loan_on_prev_car
+## 
+## |      |    0|    1|
+## |:-----|----:|----:|
+## |FALSE | 50.7| 49.3|
+## |TRUE  | 49.5| 50.5|
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# 10. CORRELATION ANALYSIS}
+\CommentTok{\# ============================================================================}
+
+\CommentTok{\# 加载}
+\FunctionTok{library}\NormalTok{(corrplot)}
+\FunctionTok{library}\NormalTok{(knitr)}
+
+\CommentTok{\# Calculate correlation matrix}
+\NormalTok{cor\_matrix }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{(data[, numerical\_vars], }\AttributeTok{use =} \StringTok{"complete.obs"}\NormalTok{)}
+
+\CommentTok{\# Visualize correlation matrix}
+\FunctionTok{corrplot}\NormalTok{(cor\_matrix, }\AttributeTok{method =} \StringTok{"color"}\NormalTok{, }\AttributeTok{type =} \StringTok{"upper"}\NormalTok{, }
+         \AttributeTok{addCoef.col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{number.cex =} \FloatTok{0.8}\NormalTok{,}
+         \AttributeTok{tl.col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{tl.srt =} \DecValTok{45}\NormalTok{, }\AttributeTok{tl.cex =} \FloatTok{0.9}\NormalTok{,}
+         \AttributeTok{title =} \StringTok{"Correlation Matrix of Numerical Variables"}\NormalTok{,}
+         \AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{0}\NormalTok{), }\AttributeTok{col =} \FunctionTok{colorRampPalette}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"pink"}\NormalTok{, }\StringTok{"white"}\NormalTok{, }\StringTok{"steelblue"}\NormalTok{))(}\DecValTok{200}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in ind1:ind2: numerical expression has 2 elements: only the first used
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-14-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Print correlation matrix}
+\FunctionTok{kable}\NormalTok{(}\FunctionTok{round}\NormalTok{(cor\_matrix, }\DecValTok{3}\NormalTok{), }\AttributeTok{caption =} \StringTok{"Correlation Coefficients"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2692}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1282}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2692}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1538}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1795}}@{}}
+\caption{Correlation Coefficients}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+car\_value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+debt\_to\_income\_ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+loan\_length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+driver\_tenure
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+car\_value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+debt\_to\_income\_ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+loan\_length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+driver\_tenure
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+car\_value & 1.000 & -0.009 & 0.035 & 0.041 \\
+debt\_to\_income\_ratio & -0.009 & 1.000 & -0.176 & -0.279 \\
+loan\_length & 0.035 & -0.176 & 1.000 & -0.113 \\
+driver\_tenure & 0.041 & -0.279 & -0.113 & 1.000 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Detect high correlations}
+\NormalTok{high\_cor }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(}\FunctionTok{abs}\NormalTok{(cor\_matrix) }\SpecialCharTok{\textgreater{}} \FloatTok{0.7} \SpecialCharTok{\&}\NormalTok{ cor\_matrix }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{, }\AttributeTok{arr.ind =} \ConstantTok{TRUE}\NormalTok{)}
+
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(high\_cor) }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{) \{}
+\NormalTok{  high\_cor\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{Variable\_1 =} \FunctionTok{rownames}\NormalTok{(cor\_matrix)[high\_cor[,}\DecValTok{1}\NormalTok{]],}
+    \AttributeTok{Variable\_2 =} \FunctionTok{colnames}\NormalTok{(cor\_matrix)[high\_cor[,}\DecValTok{2}\NormalTok{]],}
+    \AttributeTok{Correlation =} \FunctionTok{round}\NormalTok{(cor\_matrix[high\_cor], }\DecValTok{3}\NormalTok{)}
+\NormalTok{  )}
+  \FunctionTok{kable}\NormalTok{(high\_cor\_df, }\AttributeTok{caption =} \StringTok{"⚠️ High Correlations (|r| \textgreater{} 0.7)"}\NormalTok{)}
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{✓ No high correlations detected (multicollinearity check passed)}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## ✓ No high correlations detected (multicollinearity check passed)
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#多重线性问题检验}
+\FunctionTok{library}\NormalTok{(car)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: carData
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'car'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:dplyr':
+## 
+##     recode
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:purrr':
+## 
+##     some
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 拟合模型}
+\NormalTok{model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(repaid }\SpecialCharTok{\textasciitilde{}}\NormalTok{ car\_value }\SpecialCharTok{+}\NormalTok{ debt\_to\_income\_ratio }\SpecialCharTok{+} 
+\NormalTok{            loan\_length }\SpecialCharTok{+}\NormalTok{ driver\_tenure }\SpecialCharTok{+}\NormalTok{ size\_of\_downpayment,}
+            \AttributeTok{data =}\NormalTok{ data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in model.response(mf, "numeric"): using type = "numeric" with a factor
+## response will be ignored
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in Ops.factor(y, z$residuals): '-' not meaningful for factors
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 计算 VIF}
+\FunctionTok{vif}\NormalTok{(model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in Ops.factor(r, 2): '^' not meaningful for factors
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in cov2cor(v): diag(V) had non-positive or NA entries; the non-finite
+## result may be dubious
+\end{verbatim}
+
+\begin{verbatim}
+##                      GVIF Df GVIF^(1/(2*Df))
+## car_value             NaN  1             NaN
+## debt_to_income_ratio  NaN  1             NaN
+## loan_length           NaN  1             NaN
+## driver_tenure         NaN  1             NaN
+## size_of_downpayment   NaN  4             NaN
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#判断标准：}
+\CommentTok{\#{-} VIF \textless{} 5: ✅ 可接受}
+\CommentTok{\#{-} VIF 5{-}10: ⚠️ 中等共线性}
+\CommentTok{\#{-} VIF \textgreater{} 10: 🚨 严重共线性}
+
+\CommentTok{\#预期结果：}
+\CommentTok{\#所有 VIF \textless{} 2（非常好）}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================================================}
+\CommentTok{\# 12. PRINCIPAL COMPONENT ANALYSIS (修正版)}
+\CommentTok{\# ============================================================================}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{ Starting PCA Analysis...}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## 
+##  Starting PCA Analysis...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ✅ 正确定义PCA变量}
+\NormalTok{pca\_vars }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"car\_value"}\NormalTok{, }\StringTok{"debt\_to\_income\_ratio"}\NormalTok{, }\StringTok{"loan\_length"}\NormalTok{, }
+              \StringTok{"driver\_tenure"}\NormalTok{, }\StringTok{"size\_of\_downpayment"}\NormalTok{)}
+
+\CommentTok{\# 验证变量存在性}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Variables for PCA:"}\NormalTok{, }\FunctionTok{paste}\NormalTok{(pca\_vars, }\AttributeTok{collapse =} \StringTok{", "}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Variables for PCA: car_value, debt_to_income_ratio, loan_length, driver_tenure, size_of_downpayment
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Checking if all variables exist in data...}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Checking if all variables exist in data...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 检查哪些变量实际存在}
+\NormalTok{existing\_vars }\OtherTok{\textless{}{-}}\NormalTok{ pca\_vars[pca\_vars }\SpecialCharTok{\%in\%} \FunctionTok{colnames}\NormalTok{(data)]}
+\NormalTok{missing\_vars }\OtherTok{\textless{}{-}}\NormalTok{ pca\_vars[}\SpecialCharTok{!}\NormalTok{pca\_vars }\SpecialCharTok{\%in\%} \FunctionTok{colnames}\NormalTok{(data)]}
+
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(missing\_vars) }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{) \{}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"⚠ Warning: Missing variables:"}\NormalTok{, }\FunctionTok{paste}\NormalTok{(missing\_vars, }\AttributeTok{collapse =} \StringTok{", "}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Available variables:"}\NormalTok{, }\FunctionTok{paste}\NormalTok{(existing\_vars, }\AttributeTok{collapse =} \StringTok{", "}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\NormalTok{\}}
+
+\CommentTok{\# 只使用存在的变量}
+\NormalTok{pca\_vars }\OtherTok{\textless{}{-}}\NormalTok{ existing\_vars}
+
+\CommentTok{\# 移除零方差列}
+\NormalTok{vars\_ok }\OtherTok{\textless{}{-}}\NormalTok{ pca\_vars[}\FunctionTok{sapply}\NormalTok{(data[pca\_vars], }\ControlFlowTok{function}\NormalTok{(x) \{}
+  \FunctionTok{is.numeric}\NormalTok{(x) }\SpecialCharTok{\&\&} \FunctionTok{var}\NormalTok{(x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\textgreater{}} \DecValTok{0}
+\NormalTok{\})]}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Variables passing variance check:"}\NormalTok{, }\FunctionTok{paste}\NormalTok{(vars\_ok, }\AttributeTok{collapse =} \StringTok{", "}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Variables passing variance check: car_value, debt_to_income_ratio, loan_length, driver_tenure
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(vars\_ok) }\SpecialCharTok{\textgreater{}=} \DecValTok{2}\NormalTok{)\{}
+  
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Performing PCA on"}\NormalTok{, }\FunctionTok{length}\NormalTok{(vars\_ok), }\StringTok{"numerical variables...}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  
+  \CommentTok{\# 提取数据}
+\NormalTok{  pca\_data }\OtherTok{\textless{}{-}}\NormalTok{ data[, vars\_ok, drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+  
+  \CommentTok{\# 移除缺失值}
+\NormalTok{  pca\_data }\OtherTok{\textless{}{-}}\NormalTok{ pca\_data[}\FunctionTok{complete.cases}\NormalTok{(pca\_data), ]}
+  
+  \CommentTok{\# 验证数据类型}
+  \ControlFlowTok{if}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{all}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(pca\_data, is.numeric))) \{}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"Non{-}numeric data detected in PCA input"}\NormalTok{)}
+\NormalTok{  \}}
+  
+  \CommentTok{\# 执行PCA}
+\NormalTok{  pca }\OtherTok{\textless{}{-}} \FunctionTok{prcomp}\NormalTok{(pca\_data, }\AttributeTok{center =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{scale. =} \ConstantTok{TRUE}\NormalTok{)}
+  
+  \CommentTok{\# 计算解释方差}
+\NormalTok{  explained\_var }\OtherTok{\textless{}{-}}\NormalTok{ (pca}\SpecialCharTok{$}\NormalTok{sdev}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{) }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(pca}\SpecialCharTok{$}\NormalTok{sdev}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+  
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"✓ PCA computation successful}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"  Total components:"}\NormalTok{, }\FunctionTok{length}\NormalTok{(explained\_var), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"  PC1 variance:"}\NormalTok{, }\FunctionTok{round}\NormalTok{(explained\_var[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{), }\StringTok{"\%}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  
+  \CommentTok{\# ========================================================================}
+  \CommentTok{\# SCREE PLOT}
+  \CommentTok{\# ========================================================================}
+  
+\NormalTok{  scree\_data }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{PC =} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(explained\_var),}
+    \AttributeTok{Variance =}\NormalTok{ explained\_var,}
+    \AttributeTok{Cumulative =} \FunctionTok{cumsum}\NormalTok{(explained\_var)}
+\NormalTok{  )}
+  
+\NormalTok{  p\_scree }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(scree\_data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ PC)) }\SpecialCharTok{+}
+    \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ Variance, }\AttributeTok{color =} \StringTok{"Individual"}\NormalTok{), }\AttributeTok{linewidth =} \FloatTok{1.2}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ Variance, }\AttributeTok{color =} \StringTok{"Individual"}\NormalTok{), }\AttributeTok{size =} \DecValTok{3}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ Cumulative, }\AttributeTok{color =} \StringTok{"Cumulative"}\NormalTok{), }\AttributeTok{linewidth =} \FloatTok{1.2}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ Cumulative, }\AttributeTok{color =} \StringTok{"Cumulative"}\NormalTok{), }\AttributeTok{size =} \DecValTok{3}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \FloatTok{0.8}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }\AttributeTok{color =} \StringTok{"gray50"}\NormalTok{, }\AttributeTok{linewidth =} \FloatTok{0.8}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{scale\_color\_manual}\NormalTok{(}
+      \AttributeTok{name =} \StringTok{"Variance Type"}\NormalTok{,}
+      \AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"Individual"} \OtherTok{=} \StringTok{"steelblue"}\NormalTok{, }\StringTok{"Cumulative"} \OtherTok{=} \StringTok{"pink"}\NormalTok{)}
+\NormalTok{    ) }\SpecialCharTok{+}
+    \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =}\NormalTok{ scales}\SpecialCharTok{::}\NormalTok{percent, }\AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{)) }\SpecialCharTok{+}
+    \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks =} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(explained\_var)) }\SpecialCharTok{+}
+    \FunctionTok{labs}\NormalTok{(}
+      \AttributeTok{title =} \StringTok{"PCA Scree Plot"}\NormalTok{,}
+      \AttributeTok{subtitle =} \StringTok{"Dashed line indicates 80\% cumulative variance threshold"}\NormalTok{,}
+      \AttributeTok{x =} \StringTok{"Principal Component"}\NormalTok{,}
+      \AttributeTok{y =} \StringTok{"Proportion of Variance Explained"}
+\NormalTok{    ) }\SpecialCharTok{+}
+    \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+    \FunctionTok{theme}\NormalTok{(}
+      \AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{, }\AttributeTok{size =} \DecValTok{14}\NormalTok{),}
+      \AttributeTok{legend.position =} \StringTok{"bottom"}
+\NormalTok{    )}
+  
+  \FunctionTok{print}\NormalTok{(p\_scree)}
+  
+  \CommentTok{\# ========================================================================}
+  \CommentTok{\# PC1 vs PC2 SCATTER PLOT}
+  \CommentTok{\# ========================================================================}
+  
+  \CommentTok{\# 提取前两个PC}
+\NormalTok{  n\_pcs\_plot }\OtherTok{\textless{}{-}} \FunctionTok{min}\NormalTok{(}\DecValTok{2}\NormalTok{, }\FunctionTok{ncol}\NormalTok{(pca}\SpecialCharTok{$}\NormalTok{x))}
+\NormalTok{  pca\_scores }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(pca}\SpecialCharTok{$}\NormalTok{x[, }\DecValTok{1}\SpecialCharTok{:}\NormalTok{n\_pcs\_plot, }\AttributeTok{drop =} \ConstantTok{FALSE}\NormalTok{])}
+  
+  \CommentTok{\# 添加目标变量 {-} 确保索引匹配}
+\NormalTok{  pca\_scores}\SpecialCharTok{$}\NormalTok{repaid }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(}
+\NormalTok{    data}\SpecialCharTok{$}\NormalTok{repaid[}\FunctionTok{complete.cases}\NormalTok{(data[, vars\_ok])],}
+    \AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\StringTok{"0"}\NormalTok{, }\StringTok{"1"}\NormalTok{), }
+    \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Not Repaid"}\NormalTok{, }\StringTok{"Repaid"}\NormalTok{)}
+\NormalTok{  )}
+  
+  \CommentTok{\# 移除缺失值}
+\NormalTok{  pca\_scores }\OtherTok{\textless{}{-}}\NormalTok{ pca\_scores[}\FunctionTok{complete.cases}\NormalTok{(pca\_scores), ]}
+\NormalTok{  pca\_scores}\SpecialCharTok{$}\NormalTok{repaid }\OtherTok{\textless{}{-}} \FunctionTok{droplevels}\NormalTok{(pca\_scores}\SpecialCharTok{$}\NormalTok{repaid)}
+  
+  \ControlFlowTok{if}\NormalTok{(n\_pcs\_plot }\SpecialCharTok{\textgreater{}=} \DecValTok{2}\NormalTok{) \{}
+\NormalTok{    p\_pca }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(pca\_scores, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ PC1, }\AttributeTok{y =}\NormalTok{ PC2, }\AttributeTok{color =}\NormalTok{ repaid)) }\SpecialCharTok{+}
+      \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.6}\NormalTok{, }\AttributeTok{size =} \DecValTok{2}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{scale\_color\_manual}\NormalTok{(}
+        \AttributeTok{name =} \StringTok{"Repayment Status"}\NormalTok{,}
+        \AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"Not Repaid"} \OtherTok{=} \StringTok{"pink"}\NormalTok{, }\StringTok{"Repaid"} \OtherTok{=} \StringTok{"steelblue"}\NormalTok{)}
+\NormalTok{      ) }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}
+        \AttributeTok{title =} \StringTok{"PCA: First Two Principal Components"}\NormalTok{,}
+        \AttributeTok{subtitle =} \FunctionTok{paste0}\NormalTok{(}
+          \StringTok{"PC1: "}\NormalTok{, }\FunctionTok{round}\NormalTok{(explained\_var[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{), }\StringTok{"\% | "}\NormalTok{,}
+          \StringTok{"PC2: "}\NormalTok{, }\FunctionTok{round}\NormalTok{(explained\_var[}\DecValTok{2}\NormalTok{]}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{), }\StringTok{"\% | "}\NormalTok{,}
+          \StringTok{"Total: "}\NormalTok{, }\FunctionTok{round}\NormalTok{(}\FunctionTok{sum}\NormalTok{(explained\_var[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{])}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{), }\StringTok{"\%"}
+\NormalTok{        ),}
+        \AttributeTok{x =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"PC1 ("}\NormalTok{, }\FunctionTok{round}\NormalTok{(explained\_var[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{), }\StringTok{"\%)"}\NormalTok{),}
+        \AttributeTok{y =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"PC2 ("}\NormalTok{, }\FunctionTok{round}\NormalTok{(explained\_var[}\DecValTok{2}\NormalTok{]}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{), }\StringTok{"\%)"}\NormalTok{)}
+\NormalTok{      ) }\SpecialCharTok{+}
+      \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+      \FunctionTok{theme}\NormalTok{(}
+        \AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{, }\AttributeTok{size =} \DecValTok{14}\NormalTok{),}
+        \AttributeTok{legend.position =} \StringTok{"bottom"}
+\NormalTok{      )}
+    
+    \CommentTok{\# 添加置信椭圆}
+\NormalTok{    group\_counts }\OtherTok{\textless{}{-}} \FunctionTok{table}\NormalTok{(pca\_scores}\SpecialCharTok{$}\NormalTok{repaid)}
+    \ControlFlowTok{if}\NormalTok{(}\FunctionTok{all}\NormalTok{(group\_counts }\SpecialCharTok{\textgreater{}=} \DecValTok{3}\NormalTok{)) \{}
+      \FunctionTok{tryCatch}\NormalTok{(\{}
+\NormalTok{        p\_pca }\OtherTok{\textless{}{-}}\NormalTok{ p\_pca }\SpecialCharTok{+} \FunctionTok{stat\_ellipse}\NormalTok{(}\AttributeTok{level =} \FloatTok{0.95}\NormalTok{, }\AttributeTok{linewidth =} \DecValTok{1}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{)}
+\NormalTok{      \}, }\AttributeTok{error =} \ControlFlowTok{function}\NormalTok{(e) \{}
+        \FunctionTok{cat}\NormalTok{(}\StringTok{"⚠ Could not add ellipses}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\NormalTok{      \})}
+\NormalTok{    \}}
+    
+    \FunctionTok{print}\NormalTok{(p\_pca)}
+\NormalTok{  \}}
+  
+  \CommentTok{\# ========================================================================}
+  \CommentTok{\# LOADINGS TABLE}
+  \CommentTok{\# ========================================================================}
+  
+\NormalTok{  n\_components }\OtherTok{\textless{}{-}} \FunctionTok{min}\NormalTok{(}\DecValTok{3}\NormalTok{, }\FunctionTok{ncol}\NormalTok{(pca}\SpecialCharTok{$}\NormalTok{rotation))}
+\NormalTok{  loadings\_matrix }\OtherTok{\textless{}{-}}\NormalTok{ pca}\SpecialCharTok{$}\NormalTok{rotation[, }\DecValTok{1}\SpecialCharTok{:}\NormalTok{n\_components, drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+\NormalTok{  loadings\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{Variable =} \FunctionTok{rownames}\NormalTok{(loadings\_matrix),}
+    \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}
+\NormalTok{  )}
+  
+  \ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{n\_components) \{}
+\NormalTok{    loadings\_df[[}\FunctionTok{paste0}\NormalTok{(}\StringTok{"PC"}\NormalTok{, i)]] }\OtherTok{\textless{}{-}}\NormalTok{ loadings\_matrix[, i]}
+\NormalTok{  \}}
+  
+  \FunctionTok{print}\NormalTok{(}\FunctionTok{kable}\NormalTok{(loadings\_df, }\AttributeTok{digits =} \DecValTok{3}\NormalTok{, }\AttributeTok{caption =} \StringTok{"PCA Loadings"}\NormalTok{))}
+  
+  \CommentTok{\# ========================================================================}
+  \CommentTok{\# VARIANCE EXPLAINED TABLE}
+  \CommentTok{\# ========================================================================}
+  
+\NormalTok{  n\_show }\OtherTok{\textless{}{-}} \FunctionTok{min}\NormalTok{(}\DecValTok{5}\NormalTok{, }\FunctionTok{length}\NormalTok{(explained\_var))}
+\NormalTok{  variance\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{Component =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"PC"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\NormalTok{n\_show),}
+    \AttributeTok{Variance\_Explained =} \FunctionTok{paste0}\NormalTok{(}\FunctionTok{round}\NormalTok{(explained\_var[}\DecValTok{1}\SpecialCharTok{:}\NormalTok{n\_show]}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{), }\StringTok{"\%"}\NormalTok{),}
+    \AttributeTok{Cumulative\_Variance =} \FunctionTok{paste0}\NormalTok{(}\FunctionTok{round}\NormalTok{(}\FunctionTok{cumsum}\NormalTok{(explained\_var)[}\DecValTok{1}\SpecialCharTok{:}\NormalTok{n\_show]}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\DecValTok{1}\NormalTok{), }\StringTok{"\%"}\NormalTok{)}
+\NormalTok{  )}
+  
+  \FunctionTok{print}\NormalTok{(}\FunctionTok{kable}\NormalTok{(variance\_df, }\AttributeTok{caption =} \StringTok{"Variance Explained Summary"}\NormalTok{))}
+  
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{✓ PCA analysis completed successfully}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{⚠ PCA skipped: Less than 2 numerical variables}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Performing PCA on 4 numerical variables...
+## 
+## ✓ PCA computation successful
+##   Total components: 4 
+##   PC1 variance: 32.3 %
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-16-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-16-2.pdf}}
+
+\begin{verbatim}
+## 
+## 
+## Table: PCA Loadings
+## 
+## |Variable             |    PC1|    PC2|    PC3|
+## |:--------------------|------:|------:|------:|
+## |car_value            |  0.136|  0.109| -0.981|
+## |debt_to_income_ratio | -0.732| -0.153| -0.178|
+## |loan_length          |  0.213|  0.853|  0.081|
+## |driver_tenure        |  0.632| -0.488| -0.022|
+## 
+## 
+## Table: Variance Explained Summary
+## 
+## |Component |Variance_Explained |Cumulative_Variance |
+## |:---------|:------------------|:-------------------|
+## |PC1       |32.3%              |32.3%               |
+## |PC2       |27.5%              |59.9%               |
+## |PC3       |24.9%              |84.8%               |
+## |PC4       |15.2%              |100%                |
+## 
+## ✓ PCA analysis completed successfully
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# 智能 t{-}SNE 分析（自动处理所有问题）}
+\CommentTok{\# ============================================}
+\FunctionTok{library}\NormalTok{(Rtsne)}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\CommentTok{\# 智能 t{-}SNE（含零方差保护 \& PCA 降级改进）}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+
+\NormalTok{numeric\_features }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"car\_value"}\NormalTok{,}\StringTok{"debt\_to\_income\_ratio"}\NormalTok{,}\StringTok{"loan\_length"}\NormalTok{,}\StringTok{"size\_of\_downpayment"}\NormalTok{,}\StringTok{"driver\_tenure"}\NormalTok{)}
+\NormalTok{available\_features }\OtherTok{\textless{}{-}}\NormalTok{ numeric\_features[numeric\_features }\SpecialCharTok{\%in\%} \FunctionTok{names}\NormalTok{(data)]}
+\NormalTok{tsne\_features }\OtherTok{\textless{}{-}}\NormalTok{ data[ ,available\_features, drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+\NormalTok{tsne\_labels }\OtherTok{\textless{}{-}}\NormalTok{ data}\SpecialCharTok{$}\NormalTok{repaid}
+
+\CommentTok{\# 强制数值}
+\ControlFlowTok{for}\NormalTok{(col }\ControlFlowTok{in} \FunctionTok{names}\NormalTok{(tsne\_features)) \{}
+  \ControlFlowTok{if}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.numeric}\NormalTok{(tsne\_features[[col]])) tsne\_features[[col]] }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(tsne\_features[[col]]))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: NAs introduced by coercion
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 去掉全 NA 列（保险）}
+\NormalTok{tsne\_features }\OtherTok{\textless{}{-}}\NormalTok{ tsne\_features[, }\FunctionTok{colSums}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(tsne\_features)) }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{, drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+
+\CommentTok{\# 完整行}
+\NormalTok{keep }\OtherTok{\textless{}{-}} \FunctionTok{complete.cases}\NormalTok{(tsne\_features)}
+\NormalTok{tsne\_features }\OtherTok{\textless{}{-}}\NormalTok{ tsne\_features[keep, , drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+\NormalTok{tsne\_labels }\OtherTok{\textless{}{-}}\NormalTok{ tsne\_labels[keep]}
+
+\NormalTok{n\_total }\OtherTok{\textless{}{-}} \FunctionTok{nrow}\NormalTok{(tsne\_features)}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Available features:"}\NormalTok{, }\FunctionTok{paste}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(tsne\_features), }\AttributeTok{collapse =} \StringTok{", "}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Available features: car_value, debt_to_income_ratio, loan_length, driver_tenure
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Complete cases:"}\NormalTok{, n\_total, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Complete cases: 50000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 如果样本极少，直接用 PCA（但先移除零方差列）}
+\ControlFlowTok{if}\NormalTok{(n\_total }\SpecialCharTok{\textless{}} \DecValTok{10}\NormalTok{) \{}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"⚠ Too few samples for meaningful t{-}SNE (n \textless{}"}\NormalTok{, }\DecValTok{10}\NormalTok{, }\StringTok{"). Considering PCA fallback.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \CommentTok{\# remove zero{-}variance columns}
+\NormalTok{  vars\_var }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(tsne\_features, }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{var}\NormalTok{(x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+\NormalTok{  keep\_vars }\OtherTok{\textless{}{-}} \FunctionTok{names}\NormalTok{(vars\_var)[}\FunctionTok{is.finite}\NormalTok{(vars\_var) }\SpecialCharTok{\&}\NormalTok{ vars\_var }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{]}
+  \ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(keep\_vars) }\SpecialCharTok{\textgreater{}=} \DecValTok{2}\NormalTok{) \{}
+    \FunctionTok{cat}\NormalTok{(}\StringTok{"Variables used for PCA:"}\NormalTok{, }\FunctionTok{paste}\NormalTok{(keep\_vars, }\AttributeTok{collapse =} \StringTok{", "}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\NormalTok{    pca }\OtherTok{\textless{}{-}} \FunctionTok{prcomp}\NormalTok{(}\FunctionTok{scale}\NormalTok{(tsne\_features[, keep\_vars, }\AttributeTok{drop =} \ConstantTok{FALSE}\NormalTok{]), }\AttributeTok{center =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{scale. =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{    pca\_df }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(pca}\SpecialCharTok{$}\NormalTok{x[,}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{])}
+\NormalTok{    pca\_df}\SpecialCharTok{$}\NormalTok{label }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(tsne\_labels)}
+    \FunctionTok{ggplot}\NormalTok{(pca\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ PC1, }\AttributeTok{y =}\NormalTok{ PC2, }\AttributeTok{color =}\NormalTok{ label)) }\SpecialCharTok{+}
+      \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"PCA (fallback) {-} first two PCs"}\NormalTok{, }\AttributeTok{x =} \StringTok{"PC1"}\NormalTok{, }\AttributeTok{y =} \StringTok{"PC2"}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{theme\_minimal}\NormalTok{()}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"PCA fallback shown due to small sample size."}\NormalTok{)}
+\NormalTok{  \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(keep\_vars) }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) \{}
+\NormalTok{    single\_var }\OtherTok{\textless{}{-}}\NormalTok{ keep\_vars[}\DecValTok{1}\NormalTok{]}
+    \FunctionTok{cat}\NormalTok{(}\StringTok{"Only one non{-}constant numeric feature ("}\NormalTok{, single\_var, }\StringTok{"). Showing histogram.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\AttributeTok{sep =} \StringTok{""}\NormalTok{)}
+\NormalTok{    df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{x =}\NormalTok{ tsne\_features[[single\_var]], }\AttributeTok{label =} \FunctionTok{factor}\NormalTok{(tsne\_labels))}
+    \FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{fill =}\NormalTok{ label)) }\SpecialCharTok{+}
+      \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{position =} \StringTok{"identity"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{bins =} \DecValTok{30}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Distribution of"}\NormalTok{, single\_var), }\AttributeTok{x =}\NormalTok{ single\_var, }\AttributeTok{y =} \StringTok{"Count"}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{theme\_minimal}\NormalTok{()}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"Single{-}var histogram shown due to small sample size and single variable."}\NormalTok{)}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"No valid numeric features left for PCA/t{-}SNE after removing zero{-}variance or NA columns."}\NormalTok{)}
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\CommentTok{\# Remove zero{-}variance columns BEFORE scaling (this prevents prcomp/scale error)}
+\NormalTok{vars\_var }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(tsne\_features, }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{var}\NormalTok{(x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+\NormalTok{keep\_vars }\OtherTok{\textless{}{-}} \FunctionTok{names}\NormalTok{(vars\_var)[}\FunctionTok{is.finite}\NormalTok{(vars\_var) }\SpecialCharTok{\&}\NormalTok{ vars\_var }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{]}
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(keep\_vars) }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\FunctionTok{stop}\NormalTok{(}\StringTok{"No numeric features with positive variance available for t{-}SNE/PCA."}\NormalTok{)}
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(keep\_vars) }\SpecialCharTok{\textless{}} \FunctionTok{length}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(tsne\_features))) \{}
+\NormalTok{  removed }\OtherTok{\textless{}{-}} \FunctionTok{setdiff}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(tsne\_features), keep\_vars)}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Removed zero{-}variance columns:"}\NormalTok{, }\FunctionTok{paste}\NormalTok{(removed, }\AttributeTok{collapse =} \StringTok{", "}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\NormalTok{\}}
+\NormalTok{tsne\_features }\OtherTok{\textless{}{-}}\NormalTok{ tsne\_features[, keep\_vars, drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+
+\CommentTok{\# 标准化（现在安全）}
+\NormalTok{tsne\_data\_scaled }\OtherTok{\textless{}{-}} \FunctionTok{scale}\NormalTok{(tsne\_features)}
+
+\CommentTok{\# 去重处理（若存在重复）}
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{any}\NormalTok{(}\FunctionTok{duplicated}\NormalTok{(}\FunctionTok{as.data.frame}\NormalTok{(tsne\_data\_scaled)))) \{}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"⚠ Duplicated rows detected — adding tiny jitter to avoid Rtsne duplicate error.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \FunctionTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+\NormalTok{  jitter\_mat }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{rnorm}\NormalTok{(}\FunctionTok{length}\NormalTok{(tsne\_data\_scaled), }\AttributeTok{sd =} \FloatTok{1e{-}8}\NormalTok{), }\AttributeTok{nrow =} \FunctionTok{nrow}\NormalTok{(tsne\_data\_scaled))}
+\NormalTok{  tsne\_data\_scaled }\OtherTok{\textless{}{-}}\NormalTok{ tsne\_data\_scaled }\SpecialCharTok{+}\NormalTok{ jitter\_mat}
+\NormalTok{\}}
+
+\CommentTok{\# 参数选择}
+\NormalTok{DESIRED\_PERPLEXITY }\OtherTok{\textless{}{-}} \DecValTok{30}
+\NormalTok{max\_perp\_allowed }\OtherTok{\textless{}{-}} \FunctionTok{floor}\NormalTok{((}\FunctionTok{nrow}\NormalTok{(tsne\_data\_scaled) }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{) }\SpecialCharTok{/} \DecValTok{3}\NormalTok{)}
+\NormalTok{perp\_init }\OtherTok{\textless{}{-}} \FunctionTok{min}\NormalTok{(DESIRED\_PERPLEXITY, max\_perp\_allowed)}
+\NormalTok{perp\_init }\OtherTok{\textless{}{-}} \FunctionTok{max}\NormalTok{(}\DecValTok{2}\NormalTok{, perp\_init)  }\CommentTok{\# at least 2}
+
+\FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"n=\%d {-}\textgreater{} max\_perp\_allowed=\%d {-}\textgreater{} initial\_perplexity=\%d}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(tsne\_data\_scaled), max\_perp\_allowed, perp\_init))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## n=50000 -> max_perp_allowed=16666 -> initial_perplexity=30
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{perp\_candidates }\OtherTok{\textless{}{-}} \FunctionTok{unique}\NormalTok{(}\FunctionTok{c}\NormalTok{(perp\_init, }\DecValTok{30}\NormalTok{, }\DecValTok{20}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{5}\NormalTok{))}
+\NormalTok{perp\_candidates }\OtherTok{\textless{}{-}}\NormalTok{ perp\_candidates[perp\_candidates }\SpecialCharTok{\textless{}=}\NormalTok{ max\_perp\_allowed }\SpecialCharTok{\&}\NormalTok{ perp\_candidates }\SpecialCharTok{\textgreater{}=} \DecValTok{2}\NormalTok{]}
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(perp\_candidates) }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) perp\_candidates }\OtherTok{\textless{}{-}} \FunctionTok{max}\NormalTok{(}\DecValTok{2}\NormalTok{, }\FunctionTok{min}\NormalTok{(}\DecValTok{5}\NormalTok{, max\_perp\_allowed))}
+
+\CommentTok{\# 尝试 t{-}SNE}
+\NormalTok{tsne\_result }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\NormalTok{perplexity\_value }\OtherTok{\textless{}{-}} \ConstantTok{NA}
+\ControlFlowTok{for}\NormalTok{(perp\_try }\ControlFlowTok{in}\NormalTok{ perp\_candidates) \{}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Trying perplexity ="}\NormalTok{, perp\_try, }\StringTok{"...}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \FunctionTok{try}\NormalTok{(\{}
+    \FunctionTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
+\NormalTok{    tsne\_result\_tmp }\OtherTok{\textless{}{-}} \FunctionTok{Rtsne}\NormalTok{(}
+\NormalTok{      tsne\_data\_scaled,}
+      \AttributeTok{dims =} \DecValTok{2}\NormalTok{,}
+      \AttributeTok{perplexity =}\NormalTok{ perp\_try,}
+      \AttributeTok{verbose =} \ConstantTok{FALSE}\NormalTok{,}
+      \AttributeTok{max\_iter =} \DecValTok{1000}\NormalTok{,}
+      \AttributeTok{check\_duplicates =} \ConstantTok{FALSE}
+\NormalTok{    )}
+    \ControlFlowTok{if}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.null}\NormalTok{(tsne\_result\_tmp}\SpecialCharTok{$}\NormalTok{Y)) \{}
+\NormalTok{      tsne\_result }\OtherTok{\textless{}{-}}\NormalTok{ tsne\_result\_tmp}
+\NormalTok{      perplexity\_value }\OtherTok{\textless{}{-}}\NormalTok{ perp\_try}
+      \FunctionTok{cat}\NormalTok{(}\StringTok{"✅ t{-}SNE succeeded with perplexity ="}\NormalTok{, perp\_try, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+      \ControlFlowTok{break}
+\NormalTok{    \}}
+\NormalTok{  \}, }\AttributeTok{silent =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Trying perplexity = 30 ...
+## ✅ t-SNE succeeded with perplexity = 30
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 若所有尝试失败，则降级到 PCA（并确保 PCA 输入无零方差）}
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{is.null}\NormalTok{(tsne\_result)) \{}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"❌ All t{-}SNE attempts failed — falling back to PCA visualization.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \CommentTok{\# PCA 所需变量检查（已经移除零方差，但再确认）}
+\NormalTok{  vars\_var2 }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(tsne\_features, }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{var}\NormalTok{(x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+\NormalTok{  keep\_vars2 }\OtherTok{\textless{}{-}} \FunctionTok{names}\NormalTok{(vars\_var2)[}\FunctionTok{is.finite}\NormalTok{(vars\_var2) }\SpecialCharTok{\&}\NormalTok{ vars\_var2 }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{]}
+  \ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(keep\_vars2) }\SpecialCharTok{\textgreater{}=} \DecValTok{2}\NormalTok{) \{}
+\NormalTok{    pca }\OtherTok{\textless{}{-}} \FunctionTok{prcomp}\NormalTok{(}\FunctionTok{scale}\NormalTok{(tsne\_features[, keep\_vars2, }\AttributeTok{drop =} \ConstantTok{FALSE}\NormalTok{]), }\AttributeTok{center =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{scale. =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{    pca\_df }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(pca}\SpecialCharTok{$}\NormalTok{x[,}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{])}
+\NormalTok{    pca\_df}\SpecialCharTok{$}\NormalTok{label }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(tsne\_labels)}
+    \FunctionTok{ggplot}\NormalTok{(pca\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ PC1, }\AttributeTok{y =}\NormalTok{ PC2, }\AttributeTok{color =}\NormalTok{ label)) }\SpecialCharTok{+}
+      \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"PCA (fallback) {-} first two PCs"}\NormalTok{, }\AttributeTok{x =} \StringTok{"PC1"}\NormalTok{, }\AttributeTok{y =} \StringTok{"PC2"}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{theme\_minimal}\NormalTok{()}
+\NormalTok{  \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{(}\FunctionTok{length}\NormalTok{(keep\_vars2) }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) \{}
+\NormalTok{    single\_var }\OtherTok{\textless{}{-}}\NormalTok{ keep\_vars2[}\DecValTok{1}\NormalTok{]}
+\NormalTok{    df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{x =}\NormalTok{ tsne\_features[[single\_var]], }\AttributeTok{label =} \FunctionTok{factor}\NormalTok{(tsne\_labels))}
+    \FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{fill =}\NormalTok{ label)) }\SpecialCharTok{+}
+      \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{position =} \StringTok{"identity"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{bins =} \DecValTok{30}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Distribution of"}\NormalTok{, single\_var), }\AttributeTok{x =}\NormalTok{ single\_var, }\AttributeTok{y =} \StringTok{"Count"}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{theme\_minimal}\NormalTok{()}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"No valid numeric features left for PCA fallback."}\NormalTok{)}
+\NormalTok{  \}}
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+  \CommentTok{\# 成功绘图}
+\NormalTok{  tsne\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{tSNE1 =}\NormalTok{ tsne\_result}\SpecialCharTok{$}\NormalTok{Y[,}\DecValTok{1}\NormalTok{],}
+    \AttributeTok{tSNE2 =}\NormalTok{ tsne\_result}\SpecialCharTok{$}\NormalTok{Y[,}\DecValTok{2}\NormalTok{],}
+    \AttributeTok{repaid =} \FunctionTok{factor}\NormalTok{(tsne\_labels, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Not Repaid"}\NormalTok{,}\StringTok{"Repaid"}\NormalTok{))}
+\NormalTok{  )}
+\NormalTok{  centroids }\OtherTok{\textless{}{-}}\NormalTok{ tsne\_df }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{group\_by}\NormalTok{(repaid) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{summarise}\NormalTok{(}\AttributeTok{n =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{meanX =} \FunctionTok{mean}\NormalTok{(tSNE1), }\AttributeTok{meanY =} \FunctionTok{mean}\NormalTok{(tSNE2), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)}
+\NormalTok{  separation }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{((centroids}\SpecialCharTok{$}\NormalTok{meanX[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{{-}}\NormalTok{centroids}\SpecialCharTok{$}\NormalTok{meanX[}\DecValTok{2}\NormalTok{])}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}\NormalTok{ (centroids}\SpecialCharTok{$}\NormalTok{meanY[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{{-}}\NormalTok{centroids}\SpecialCharTok{$}\NormalTok{meanY[}\DecValTok{2}\NormalTok{])}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+
+\NormalTok{  p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(tsne\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ tSNE1, }\AttributeTok{y =}\NormalTok{ tSNE2, }\AttributeTok{color =}\NormalTok{ repaid)) }\SpecialCharTok{+}
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.6}\NormalTok{, }\AttributeTok{size =} \FloatTok{1.8}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{stat\_ellipse}\NormalTok{(}\AttributeTok{level =} \FloatTok{0.9}\NormalTok{, }\AttributeTok{linetype =} \DecValTok{2}\NormalTok{, }\AttributeTok{linewidth =} \FloatTok{0.6}\NormalTok{, }\AttributeTok{show.legend =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{scale\_color\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"Not Repaid"} \OtherTok{=} \StringTok{"pink"}\NormalTok{,}\StringTok{"Repaid"} \OtherTok{=} \StringTok{"steelblue"}\NormalTok{)) }\SpecialCharTok{+}
+    \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"t{-}SNE Visualization"}\NormalTok{, }\AttributeTok{subtitle =} \FunctionTok{sprintf}\NormalTok{(}\StringTok{"perplexity=\%d | obs=\%d | separation=\%.2f"}\NormalTok{, perplexity\_value, }\FunctionTok{nrow}\NormalTok{(tsne\_df), separation)) }\SpecialCharTok{+}
+    \FunctionTok{theme\_minimal}\NormalTok{()}
+  \FunctionTok{print}\NormalTok{(p)}
+
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Summary:}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \FunctionTok{print}\NormalTok{(centroids)}
+  \FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"Centroid separation = \%.3f}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, separation))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{02EDA_files/figure-latex/unnamed-chunk-17-1.pdf}}
+
+\begin{verbatim}
+## Summary:
+## # A tibble: 2 x 4
+##   repaid         n meanX meanY
+##   <fct>      <int> <dbl> <dbl>
+## 1 Not Repaid 25021  4.02  4.52
+## 2 Repaid     24979 -4.03 -4.53
+## Centroid separation = 12.111
+\end{verbatim}
+
+\end{document}
