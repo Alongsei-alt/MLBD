@@ -1,0 +1,5 @@
+"Prediction","Reference","Freq"
+"Not_Repaid","Not_Repaid",17042
+"Repaid","Not_Repaid",473
+"Not_Repaid","Repaid",444
+"Repaid","Repaid",17042

@@ -1,0 +1,7 @@
+Best Model (by Avg_Rank or ROC_AUC): Logistic Regression
+Avg_Rank: 1
+ROC_AUC: 0.933536
+Accuracy: 0.874658
+Precision: 0.881889
+Sensitivity (Recall): 0.864941
+F1_Score: 0.873332
