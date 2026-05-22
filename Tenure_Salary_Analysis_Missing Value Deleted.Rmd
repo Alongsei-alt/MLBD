@@ -1,0 +1,455 @@
+---
+title: "Tenure_Salary_Analysis_Missing Value Deleted"
+output: html_notebook
+---
+Part 1: Data Loading and Preprocessing
+```{r}
+# Load required libraries
+library(tidyverse)
+library(corrplot)
+library(gridExtra)
+
+# Load data
+data <- read.csv("car_loan_data.csv")
+
+# 1. Check data dimensions and missing values
+cat("\nOriginal data dimensions:", dim(data), "\n")
+cat("\nMissing values count:\n")
+print(colSums(is.na(data)))
+
+data_clean <- na.omit(data)
+cat("\nData dimensions after removing missing values:", dim(data_clean), "\n")
+cat("Number of rows deleted:", nrow(data) - nrow(data_clean), "\n\n")
+
+# 2. Data structure and summary statistics
+cat("\n=== Data Structure ===\n")
+str(data_clean)
+cat("\n=== Summary Statistics ===\n")
+summary(data_clean)
+
+```
+
+Part 2: Univariate Analysis - Numerical Variables
+
+```{r}
+# ============================================
+# Univariate Analysis
+# ============================================
+
+# Define numerical variables
+numeric_vars <- c("car_value", "debt_to_income_ratio", "loan_length", 
+                  "driver_tenure", "repaid")
+
+# Histograms for numerical variables
+p1 <- ggplot(data_clean, aes(x = car_value)) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "black", alpha = 0.7) +
+  labs(title = "Car Value Distribution", x = "Car Value", y = "Frequency") +
+  theme_minimal()
+
+p2 <- ggplot(data_clean, aes(x = debt_to_income_ratio)) +
+  geom_histogram(bins = 30, fill = "coral", color = "black", alpha = 0.7) +
+  labs(title = "Debt to Income Ratio Distribution", 
+       x = "Debt to Income Ratio", y = "Frequency") +
+  theme_minimal()
+
+p3 <- ggplot(data_clean, aes(x = loan_length)) +
+  geom_histogram(bins = 15, fill = "lightgreen", color = "black", alpha = 0.7) +
+  labs(title = "Loan Length Distribution", 
+       x = "Loan Length (months)", y = "Frequency") +
+  theme_minimal()
+
+p4 <- ggplot(data_clean, aes(x = driver_tenure)) +
+  geom_histogram(bins = 30, fill = "gold", color = "black", alpha = 0.7) +
+  labs(title = "Driver Tenure Distribution", 
+       x = "Driver Tenure (years)", y = "Frequency") +
+  theme_minimal()
+
+# Display histograms
+grid.arrange(p1, p2, p3, p4, ncol = 2)
+
+```
+
+Part 3: Univariate Analysis - Categorical Variables
+```{r}
+# Bar charts for categorical variables
+p5 <- ggplot(data_clean, aes(x = salary_range)) +
+  geom_bar(fill = "purple", alpha = 0.7) +
+  labs(title = "Salary Range Distribution", 
+       x = "Salary Range", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p6 <- ggplot(data_clean, aes(x = size_of_downpayment)) +
+  geom_bar(fill = "orange", alpha = 0.7) +
+  labs(title = "Down Payment Size Distribution", 
+       x = "Down Payment Size", y = "Count") +
+  theme_minimal()
+
+p7 <- ggplot(data_clean, aes(x = factor(repaid_loan_on_prev_car))) +
+  geom_bar(fill = "pink", alpha = 0.7) +
+  labs(title = "Previous Loan Repayment Status", 
+       x = "Repaid Previous Loan", y = "Count") +
+  theme_minimal()
+
+p8 <- ggplot(data_clean, aes(x = factor(repaid))) +
+  geom_bar(fill = "lightblue", alpha = 0.7) +
+  labs(title = "Current Loan Repayment Status", 
+       x = "Repaid (0=No, 1=Yes)", y = "Count") +
+  theme_minimal()
+
+grid.arrange(p5, p6, p7, p8, ncol = 2)
+
+```
+
+
+
+Part 4: Boxplots for Outlier Detection
+```{r}
+# Boxplots for outlier detection
+p9 <- ggplot(data_clean, aes(y = car_value)) +
+  geom_boxplot(fill = "steelblue", alpha = 0.7) +
+  labs(title = "Car Value Boxplot", y = "Car Value") +
+  theme_minimal()
+
+p10 <- ggplot(data_clean, aes(y = debt_to_income_ratio)) +
+  geom_boxplot(fill = "coral", alpha = 0.7) +
+  labs(title = "Debt to Income Ratio Boxplot", y = "Debt to Income Ratio") +
+  theme_minimal()
+
+p11 <- ggplot(data_clean, aes(y = driver_tenure)) +
+  geom_boxplot(fill = "gold", alpha = 0.7) +
+  labs(title = "Driver Tenure Boxplot", y = "Driver Tenure") +
+  theme_minimal()
+
+grid.arrange(p9, p10, p11, ncol = 3)
+
+```
+
+Part 5: Bivariate Analysis - Correlation Matrix
+```{r}
+# ============================================
+# Bivariate Analysis
+# ============================================
+
+# Correlation matrix for numerical variables
+numeric_data <- data_clean %>% 
+  select(car_value, debt_to_income_ratio, loan_length, driver_tenure, repaid)
+
+cor_matrix <- cor(numeric_data, use = "complete.obs")
+print("Correlation Matrix:")
+print(round(cor_matrix, 3))
+
+# Correlation plot
+corrplot(cor_matrix, method = "color", type = "upper", 
+         addCoef.col = "black", tl.col = "black", tl.srt = 45,
+         title = "Correlation Matrix Heatmap", mar = c(0,0,1,0))
+
+```
+
+Part 6: Bivariate Analysis - Repayment Status vs Numerical Variables
+
+```{r}
+# Boxplots: Repayment status vs numerical variables
+p12 <- ggplot(data_clean, aes(x = factor(repaid), y = car_value)) +
+  geom_boxplot(aes(fill = factor(repaid)), alpha = 0.7) +
+  labs(title = "Car Value vs Repayment Status", 
+       x = "Repayment Status", y = "Car Value") +
+  scale_fill_manual(values = c("red", "green"), 
+                    labels = c("Not Repaid", "Repaid")) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+p13 <- ggplot(data_clean, aes(x = factor(repaid), y = debt_to_income_ratio)) +
+  geom_boxplot(aes(fill = factor(repaid)), alpha = 0.7) +
+  labs(title = "Debt to Income Ratio vs Repayment Status", 
+       x = "Repayment Status", y = "Debt to Income Ratio") +
+  scale_fill_manual(values = c("red", "green"), 
+                    labels = c("Not Repaid", "Repaid")) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+p14 <- ggplot(data_clean, aes(x = factor(repaid), y = driver_tenure)) +
+  geom_boxplot(aes(fill = factor(repaid)), alpha = 0.7) +
+  labs(title = "Driver Tenure vs Repayment Status", 
+       x = "Repayment Status", y = "Driver Tenure") +
+  scale_fill_manual(values = c("red", "green"), 
+                    labels = c("Not Repaid", "Repaid")) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+grid.arrange(p12, p13, p14, ncol = 2)
+
+# Scatter plot matrix
+pairs(numeric_data, 
+      main = "Scatter Plot Matrix of Numerical Variables",
+      col = ifelse(data_clean$repaid == 1, "green", "red"),
+      pch = 19, cex = 0.5)
+
+```
+
+Part 7: Bivariate Analysis - Categorical Variables vs Repayment
+
+```{r}
+# Stacked bar charts: Categorical variables vs repayment status
+p15 <- ggplot(data_clean, aes(x = salary_range, fill = factor(repaid))) +
+  geom_bar(position = "fill") +
+  labs(title = "Salary Range vs Repayment Status", 
+       x = "Salary Range", y = "Proportion") +
+  scale_fill_manual(values = c("red", "green"), 
+                    labels = c("Not Repaid", "Repaid"),
+                    name = "Repayment Status") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p16 <- ggplot(data_clean, aes(x = size_of_downpayment, fill = factor(repaid))) +
+  geom_bar(position = "fill") +
+  labs(title = "Down Payment Size vs Repayment Status", 
+       x = "Down Payment Size", y = "Proportion") +
+  scale_fill_manual(values = c("red", "green"), 
+                    labels = c("Not Repaid", "Repaid"),
+                    name = "Repayment Status") +
+  theme_minimal()
+
+p17 <- ggplot(data_clean, aes(x = factor(repaid_loan_on_prev_car), 
+                               fill = factor(repaid))) +
+  geom_bar(position = "fill") +
+  labs(title = "Previous Loan Repayment vs Current Repayment Status", 
+       x = "Previous Loan Repayment", y = "Proportion") +
+  scale_fill_manual(values = c("red", "green"), 
+                    labels = c("Not Repaid", "Repaid"),
+                    name = "Repayment Status") +
+  theme_minimal()
+
+grid.arrange(p15, p16, p17, ncol = 2)
+
+```
+
+Part 8: Statistical Tests
+
+```{r}
+# Statistical significance tests
+cat("\n=== Statistical Tests ===\n")
+
+# t-tests for numerical variables
+cat("\nt-test for Car Value:\n")
+print(t.test(car_value ~ repaid, data = data_clean))
+
+cat("\nt-test for Debt to Income Ratio:\n")
+print(t.test(debt_to_income_ratio ~ repaid, data = data_clean))
+
+cat("\nt-test for Driver Tenure:\n")
+print(t.test(driver_tenure ~ repaid, data = data_clean))
+
+# Chi-square tests for categorical variables
+cat("\nChi-square test for Salary Range:\n")
+print(chisq.test(table(data_clean$salary_range, data_clean$repaid)))
+
+cat("\nChi-square test for Down Payment Size:\n")
+print(chisq.test(table(data_clean$size_of_downpayment, data_clean$repaid)))
+
+# Save cleaned data
+write.csv(data_clean, "car_loan_data_clean.csv", row.names = FALSE)
+cat("\nCleaned data saved as car_loan_data_clean.csv\n")
+
+```
+
+Part 9: Tenure-Salary Analysis - Descriptive Statistics
+```{r}
+# ============================================
+# Tenure-Salary Relationship Analysis
+# ============================================
+
+cat("\n=== Tenure-Salary Analysis ===\n")
+
+# 1. Descriptive statistics by salary range
+tenure_by_salary <- data_clean %>%
+  group_by(salary_range) %>%
+  summarise(
+    mean_tenure = mean(driver_tenure, na.rm = TRUE),
+    median_tenure = median(driver_tenure, na.rm = TRUE),
+    sd_tenure = sd(driver_tenure, na.rm = TRUE),
+    min_tenure = min(driver_tenure, na.rm = TRUE),
+    max_tenure = max(driver_tenure, na.rm = TRUE),
+    count = n()
+  ) %>%
+  arrange(desc(mean_tenure))
+
+print(tenure_by_salary)
+
+```
+
+Part 10: Tenure-Salary Visualizations (Boxplot & Violin Plot)
+
+```{r}
+# 2. Boxplot: Tenure by salary range
+p_tenure_salary_box <- ggplot(data_clean, aes(x = salary_range, y = driver_tenure)) +
+  geom_boxplot(aes(fill = salary_range), alpha = 0.7, outlier.color = "red") +
+  stat_summary(fun = mean, geom = "point", shape = 23, size = 3, 
+               fill = "white", color = "black") +
+  labs(title = "Driver Tenure Distribution by Salary Range", 
+       subtitle = "Diamond markers indicate mean values",
+       x = "Salary Range", 
+       y = "Driver Tenure (years)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none") +
+  scale_fill_brewer(palette = "Set3")
+
+print(p_tenure_salary_box)
+
+# 3. Violin plot: Tenure by salary range
+p_tenure_salary_violin <- ggplot(data_clean, aes(x = salary_range, y = driver_tenure)) +
+  geom_violin(aes(fill = salary_range), alpha = 0.7, trim = FALSE) +
+  geom_boxplot(width = 0.1, fill = "white", alpha = 0.5) +
+  labs(title = "Driver Tenure Distribution by Salary Range (Violin Plot)", 
+       x = "Salary Range", 
+       y = "Driver Tenure (years)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none") +
+  scale_fill_brewer(palette = "Pastel1")
+
+print(p_tenure_salary_violin)
+
+```
+
+Part 11: Tenure-Salary Visualizations (Bar Chart & Histogram)
+
+```{r}
+# 4. Bar chart: Mean tenure by salary range with error bars
+p_tenure_salary_bar <- ggplot(tenure_by_salary, aes(x = reorder(salary_range, mean_tenure), 
+                                                      y = mean_tenure)) +
+  geom_bar(stat = "identity", aes(fill = salary_range), alpha = 0.8) +
+  geom_errorbar(aes(ymin = mean_tenure - sd_tenure, 
+                    ymax = mean_tenure + sd_tenure), 
+                width = 0.2, color = "black") +
+  geom_text(aes(label = round(mean_tenure, 2)), 
+            vjust = -0.5, size = 3.5) +
+  labs(title = "Mean Driver Tenure by Salary Range", 
+       subtitle = "Error bars represent standard deviation",
+       x = "Salary Range", 
+       y = "Mean Driver Tenure (years)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none") +
+  scale_fill_brewer(palette = "Set2")
+
+print(p_tenure_salary_bar)
+
+# 5. Faceted histogram: Tenure distribution by salary range
+p_tenure_salary_hist <- ggplot(data_clean, aes(x = driver_tenure)) +
+  geom_histogram(aes(fill = salary_range), bins = 30, alpha = 0.7, color = "black") +
+  facet_wrap(~salary_range, scales = "free_y") +
+  labs(title = "Driver Tenure Distribution by Salary Range (Faceted)", 
+       x = "Driver Tenure (years)", 
+       y = "Frequency") +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  scale_fill_brewer(palette = "Set3")
+
+print(p_tenure_salary_hist)
+
+```
+
+Part 12: ANOVA and Post-hoc Tests
+```{r}
+# 6. ANOVA test
+cat("\nOne-way ANOVA Test Results:\n")
+anova_result <- aov(driver_tenure ~ salary_range, data = data_clean)
+print(summary(anova_result))
+
+# 7. Tukey HSD post-hoc test
+cat("\nTukey HSD Post-hoc Test Results:\n")
+tukey_result <- TukeyHSD(anova_result)
+print(tukey_result)
+
+# 8. Kruskal-Wallis test (non-parametric alternative)
+cat("\nKruskal-Wallis Test Results:\n")
+kruskal_result <- kruskal.test(driver_tenure ~ salary_range, data = data_clean)
+print(kruskal_result)
+
+# 9. Effect size (Eta-squared)
+cat("\nEffect Size (Eta-squared):\n")
+ss_total <- sum((data_clean$driver_tenure - mean(data_clean$driver_tenure))^2)
+ss_between <- sum(anova_result$fitted.values - mean(data_clean$driver_tenure))^2
+eta_squared <- ss_between / ss_total
+cat("Eta² =", round(eta_squared, 4), "\n")
+cat("Variance explained by salary range:", round(eta_squared * 100, 2), "%\n")
+
+```
+
+
+Part 13: Additional Visualizations
+```{r}
+# 10. Density plot: Tenure distribution by salary range
+p_tenure_salary_density <- ggplot(data_clean, aes(x = driver_tenure, fill = salary_range)) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Driver Tenure Density Distribution by Salary Range", 
+       x = "Driver Tenure (years)", 
+       y = "Density",
+       fill = "Salary Range") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set1")
+
+print(p_tenure_salary_density)
+
+# 11. Combined plot: Violin + Boxplot + Jitter + Mean
+p_tenure_salary_combined <- ggplot(data_clean, aes(x = salary_range, y = driver_tenure)) +
+  geom_violin(aes(fill = salary_range), alpha = 0.3) +
+  geom_boxplot(width = 0.2, alpha = 0.7, outlier.shape = NA) +
+  geom_jitter(alpha = 0.1, width = 0.2, size = 0.5) +
+  stat_summary(fun = mean, geom = "point", shape = 23, size = 4, 
+               fill = "red", color = "black") +
+  labs(title = "Comprehensive Driver Tenure Analysis by Salary Range", 
+       subtitle = "Violin plot + Boxplot + Individual points + Mean (red diamond)",
+       x = "Salary Range", 
+       y = "Driver Tenure (years)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none") +
+  scale_fill_brewer(palette = "Spectral")
+
+print(p_tenure_salary_combined)
+
+```
+
+Part 14: Summary Tables and Export
+```{r}
+# 12. Sample size distribution
+sample_size <- data_clean %>%
+  group_by(salary_range) %>%
+  summarise(n = n()) %>%
+  mutate(percentage = round(n / sum(n) * 100, 2))
+
+cat("\nSample Size by Salary Range:\n")
+print(sample_size)
+
+# 13. Comprehensive comparison table
+comparison_table <- data_clean %>%
+  group_by(salary_range) %>%
+  summarise(
+    Count = n(),
+    Mean = round(mean(driver_tenure, na.rm = TRUE), 2),
+    Median = round(median(driver_tenure, na.rm = TRUE), 2),
+    SD = round(sd(driver_tenure, na.rm = TRUE), 2),
+    Min = round(min(driver_tenure, na.rm = TRUE), 2),
+    Max = round(max(driver_tenure, na.rm = TRUE), 2),
+    IQR = round(IQR(driver_tenure, na.rm = TRUE), 2)
+  ) %>%
+  arrange(desc(Mean))
+
+cat("\nComprehensive Comparison Table:\n")
+print(comparison_table)
+
+# 14. Export analysis results
+write.csv(comparison_table, "tenure_salary_analysis.csv", row.names = FALSE)
+cat("\nAnalysis results saved as tenure_salary_analysis.csv\n")
+
+```
+
+
+
+
+
+
+
