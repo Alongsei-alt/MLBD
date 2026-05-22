@@ -1,0 +1,13 @@
+"Feature","Importance"
+"loan_length",100
+"payment_to_income",72.6642491701578
+"debt_to_income_ratio",72.6490668391954
+"driver_tenure",66.4224771190841
+"salary_range.0...20K..",52.7414935681596
+"car_value",39.4279709663972
+"downpayment_amount",29.4045729958506
+"repaid_loan_on_prev_car",19.8454065297923
+"loan_to_value_ratio",14.4803411286415
+"salary_range.40K...60K..",6.33240178311236
+"salary_range.20K...40K..",6.13392294399096
+"salary_range.60K...",0
