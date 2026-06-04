@@ -1,0 +1,6 @@
+Best Model: XGBoost
+ROC-AUC: 0.9712
+Accuracy: 0.943
+Precision: 0.9369
+Recall: 0.9498
+F1 Score: 0.9433
