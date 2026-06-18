@@ -1,0 +1,1517 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+# ============================================================================
+# STEP 1: SETUP AND DATA LOADING
+# ============================================================================
+
+# Clear environment
+rm(list = ls())
+gc()
+setwd("C:/Users/Along/Desktop/mlbd")
+# Load required libraries
+library(tidyverse)      # Data manipulation
+library(caret)          # Model training
+library(randomForest)   # Random Forest
+library(xgboost)        # XGBoost
+library(pROC)           # ROC curves
+library(gridExtra)      # Multiple plots
+library(knitr)          # Tables
+library(kableExtra)     # Enhanced tables
+
+# Set random seed for reproducibility
+set.seed(42)
+
+cat("\n", rep("=", 70), "\n", sep = "")
+cat("CAR LOAN DEFAULT PREDICTION - COMPLETE ANALYSIS\n")
+cat(rep("=", 70), "\n\n", sep = "")
+
+# Load data
+cat("Loading data...\n")
+
+if (!file.exists("car_loan_data_with_tenure.csv")) {
+  cat("Error: File not found in current directory.\n")
+  cat("Current working directory:", getwd(), "\n")
+  cat("Please check:\n")
+  cat("1. File name is correct\n")
+  cat("2. File is in the working directory\n")
+  cat("3. Use setwd() to change directory if needed\n\n")
+  
+  cat("Searching for CSV files in current directory:\n")
+  csv_files <- list.files(pattern = "\\.csv$")
+  if (length(csv_files) > 0) {
+    print(csv_files)
+  } else {
+    cat("No CSV files found.\n")
+  }
+  stop("Cannot proceed without data file.")
+}
+
+# Read Data
+data_raw <- read.csv("car_loan_data_with_tenure.csv", 
+                     stringsAsFactors = FALSE)
+
+cat(sprintf("✓ Data loaded: %d rows x %d columns\n", 
+            nrow(data_raw), ncol(data_raw)))
+
+# Display data structure
+cat("\nData structure:\n")
+str(data_raw)
+
+# Display first few rows
+cat("\nFirst 5 rows:\n")
+print(head(data_raw, 5))
+
+cat("\n✓ STEP 1 COMPLETE\n\n")
+
+
+```
+
+STEP 2: Data Cleaning
+```{r}
+# ============================================================================
+# STEP 2: DATA CLEANING
+# ============================================================================
+
+library(dplyr)
+library(stringr)
+
+cat(rep("=", 70), "\n")
+cat("STEP 2: DATA CLEANING\n")
+cat(rep("=", 70), "\n\n")
+
+# ----------------------------------------
+# Make a working copy
+# ----------------------------------------
+data_clean <- data_raw
+
+# ----------------------------------------
+# 2.1 Fix repaid (most important)
+# ----------------------------------------
+cat("Fixing `repaid`...\n")
+
+normalize_repaid <- function(x){
+  v <- trimws(tolower(as.character(x)))
+  v[v %in% c("0","0.0","false","no","n","not repaid","not_repaid")] <- "0"
+  v[v %in% c("1","1.0","true","yes","y","repaid","paid")]         <- "1"
+  suppressWarnings(as.numeric(v))
+}
+
+data_clean$repaid <- normalize_repaid(data_clean$repaid)
+
+if(any(is.na(data_clean$repaid))) stop("ERROR: repaid still contains NA — inspect raw data!")
+
+cat("✓ repaid normalized to numeric (0/1)\n\n")
+
+# ----------------------------------------
+# 2.2 size_of_downpayment → numeric decimal
+# ----------------------------------------
+cat("Fixing size_of_downpayment...\n")
+
+data_clean$size_of_downpayment <- gsub("%","", as.character(data_clean$size_of_downpayment))
+data_clean$size_of_downpayment <- trimws(data_clean$size_of_downpayment)
+data_clean$size_of_downpayment <- suppressWarnings(as.numeric(data_clean$size_of_downpayment)) / 100
+data_clean$size_of_downpayment[is.na(data_clean$size_of_downpayment)] <- 0
+
+cat("✓ size_of_downpayment converted to decimal\n\n")
+
+# ----------------------------------------
+# 2.3 car_value → numeric
+# ----------------------------------------
+cat("Fixing car_value...\n")
+
+data_clean$car_value <- gsub("[^0-9\\.-]","", as.character(data_clean$car_value))
+data_clean$car_value <- suppressWarnings(as.numeric(data_clean$car_value))
+
+if (all(is.na(data_clean$car_value))) stop("ERROR: car_value conversion failed.")
+
+data_clean$car_value[is.na(data_clean$car_value)] <- median(data_clean$car_value, na.rm=TRUE)
+
+cat("✓ car_value cleaned\n\n")
+
+# ----------------------------------------
+# 2.4 repaid_loan_on_prev_car → 0/1
+# ----------------------------------------
+cat("Fixing repaid_loan_on_prev_car...\n")
+
+v <- tolower(trimws(as.character(data_clean$repaid_loan_on_prev_car)))
+v[v %in% c("1","true","t","yes","y")] <- 1
+v[v %in% c("0","false","f","no","n")] <- 0
+data_clean$repaid_loan_on_prev_car <- suppressWarnings(as.numeric(v))
+data_clean$repaid_loan_on_prev_car[is.na(data_clean$repaid_loan_on_prev_car)] <- 0
+
+cat("✓ repaid_loan_on_prev_car → numeric 0/1\n\n")
+
+# ----------------------------------------
+# 2.5 driver_tenure → numeric
+# ----------------------------------------
+cat("Fixing driver_tenure...\n")
+
+if(!"driver_tenure" %in% names(data_clean)){
+  data_clean$driver_tenure <- NA_real_
+} else {
+  data_clean$driver_tenure <- gsub(",",".", as.character(data_clean$driver_tenure))
+  data_clean$driver_tenure <- suppressWarnings(as.numeric(data_clean$driver_tenure))
+}
+
+cat("✓ driver_tenure cleaned\n\n")
+
+# ----------------------------------------
+# 2.6 salary_range prepare cleaned version
+# ----------------------------------------
+data_clean$salary_range_clean <- tolower(
+  gsub("[^0-9k\\+\\-– ]","", as.character(data_clean$salary_range))
+)
+
+cat("✓ salary_range cleaned helper column created\n\n")
+
+cat("STEP 2 Completed\n\n")
+
+```
+
+
+
+STEP 3: Feature Engineering
+```{r}
+# ============================================================================
+# STEP 3: FEATURE ENGINEERING (FINAL, 8 FEATURES including driver_tenure)
+# - Robust cleaning for repaid, salary_range, size_of_downpayment, driver_tenure
+# - Creates derived features and selects final 8 features + repaid target
+# ============================================================================
+
+# required packages
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+})
+
+cat(rep("=", 70), "\n")
+cat("STEP 3: FEATURE ENGINEERING (8 FEATURES)\n")
+cat(rep("=", 70), "\n\n")
+
+# ----------------------------------------------------------------------------
+# 3.0 Robust cleaning of key columns BEFORE feature engineering
+# ----------------------------------------------------------------------------
+
+cat("=== 3.0 Robust cleaning: repaid, size_of_downpayment, salary_range, driver_tenure, repaid_loan_on_prev_car ===\n\n")
+
+# Ensure data_clean exists
+if (!exists("data_clean")) stop("data_clean not found. Run STEP 2 first.")
+
+# 3.0.1 Normalize repaid (accepts "0"/"1", "yes"/"no", logical, etc.)
+data_clean <- data_clean %>%
+  mutate(
+    repaid = as.character(repaid),
+    repaid = trimws(tolower(repaid)),
+    repaid = case_when(
+      repaid %in% c("0", "0.0", "no", "false", "n", "not_repaid", "not repaid", "not-repaid") ~ "0",
+      repaid %in% c("1", "1.0", "yes", "true", "y", "repaid", "paid") ~ "1",
+      TRUE ~ repaid  # keep whatever else for now (we'll coerce below)
+    )
+  )
+
+# If repaid is logical (rare), handle it
+if (is.logical(data_clean$repaid)) {
+  data_clean$repaid <- ifelse(data_clean$repaid, "1", "0")
+}
+
+# Try to coerce remaining to numeric (this will convert "0"/"1" -> 0/1)
+data_clean$repaid <- suppressWarnings(as.numeric(as.character(data_clean$repaid)))
+
+# Safety check: if any NA remain in repaid, stop with informative message
+if (any(is.na(data_clean$repaid))) {
+  na_vals <- unique(data_clean$repaid[is.na(data_clean$repaid)])
+  stop("ERROR: repaid contains NA after attempted normalization. Inspect original values. Example NA count: ",
+       sum(is.na(data_clean$repaid)))
+}
+
+cat("✓ repaid normalized to numeric 0/1 (no NA)\n\n")
+
+# 3.0.2 size_of_downpayment: convert "40%" or "40 % " to decimal 0.4
+if ("size_of_downpayment" %in% names(data_clean)) {
+  data_clean <- data_clean %>%
+    mutate(
+      size_of_downpayment = as.character(size_of_downpayment),
+      size_of_downpayment = trimws(size_of_downpayment),
+      size_of_downpayment = ifelse(size_of_downpayment == "", NA_character_, size_of_downpayment),
+      size_of_downpayment = gsub(",", ".", size_of_downpayment),
+      size_of_downpayment = gsub("%", "", size_of_downpayment),
+      size_of_downpayment = as.numeric(size_of_downpayment) / 100
+    )
+  # replace any remaining NA with 0 (if you'd rather stop, change this)
+  data_clean$size_of_downpayment[is.na(data_clean$size_of_downpayment)] <- 0
+  cat("✓ size_of_downpayment cleaned to decimal (example values):\n")
+  print(head(data_clean$size_of_downpayment, 5))
+  cat("\n")
+} else {
+  stop("ERROR: size_of_downpayment column not found in data_clean.")
+}
+
+# 3.0.3 car_value: remove currency symbols and commas -> numeric
+if ("car_value" %in% names(data_clean)) {
+  data_clean <- data_clean %>%
+    mutate(
+      car_value = as.character(car_value),
+      car_value = gsub("[^0-9\\.\\-]", "", car_value),
+      car_value = trimws(car_value),
+      car_value = as.numeric(car_value)
+    )
+  # if still NA, replace with median as a fallback
+  if (all(is.na(data_clean$car_value))) stop("ERROR: car_value conversion produced all NA.")
+  data_clean$car_value[is.na(data_clean$car_value)] <- median(data_clean$car_value, na.rm = TRUE)
+  cat("✓ car_value cleaned to numeric (example):\n")
+  print(head(data_clean$car_value, 5))
+  cat("\n")
+} else {
+  stop("ERROR: car_value column not found in data_clean.")
+}
+
+# 3.0.4 repaid_loan_on_prev_car -> numeric 0/1
+if ("repaid_loan_on_prev_car" %in% names(data_clean)) {
+  data_clean <- data_clean %>%
+    mutate(
+      repaid_loan_on_prev_car = as.character(repaid_loan_on_prev_car),
+      repaid_loan_on_prev_car = trimws(tolower(repaid_loan_on_prev_car)),
+      repaid_loan_on_prev_car = case_when(
+        repaid_loan_on_prev_car %in% c("1","1.0","true","t","yes","y") ~ 1,
+        repaid_loan_on_prev_car %in% c("0","0.0","false","f","no","n") ~ 0,
+        TRUE ~ NA_real_
+      )
+    )
+  # fill NA with 0 (or choose another policy)
+  data_clean$repaid_loan_on_prev_car[is.na(data_clean$repaid_loan_on_prev_car)] <- 0
+  cat("✓ repaid_loan_on_prev_car normalized to 0/1\n\n")
+} else {
+  stop("ERROR: repaid_loan_on_prev_car not found.")
+}
+
+# 3.0.5 driver_tenure -> numeric (in years). If missing create NA; convert commas->dot
+if ("driver_tenure" %in% names(data_clean)) {
+  data_clean <- data_clean %>%
+    mutate(
+      driver_tenure = as.character(driver_tenure),
+      driver_tenure = gsub(",", ".", driver_tenure),
+      driver_tenure = trimws(driver_tenure),
+      driver_tenure = as.numeric(driver_tenure)
+    )
+  # if some NA, leave as NA - will be handled later
+  cat("✓ driver_tenure coerced to numeric (example):\n")
+  print(head(data_clean$driver_tenure, 5))
+  cat("\n")
+} else {
+  # create placeholder if absent (will be included but NA)
+  data_clean$driver_tenure <- NA_real_
+  cat("⚠ driver_tenure not present - created NA column.\n\n")
+}
+
+# 3.0.6 salary_range: keep as-is, but prepare a cleaned version for mapping
+if ("salary_range" %in% names(data_clean)) {
+  data_clean <- data_clean %>%
+    mutate(
+      salary_range_raw = as.character(salary_range),
+      salary_range_clean = tolower(gsub("[^0-9k\\+\\-– ]", "", salary_range_raw)),
+      salary_range_clean = trimws(salary_range_clean)
+    )
+  cat("✓ salary_range cleaned (example):\n")
+  print(head(data_clean$salary_range_raw, 6))
+  cat("\n")
+} else {
+  stop("ERROR: salary_range not found.")
+}
+
+# ----------------------------------------------------------------------------
+# 3.1 Create derived features
+# ----------------------------------------------------------------------------
+
+cat("=== 3.1 Creating Derived Features ===\n\n")
+
+data_features <- data_clean %>%
+  mutate(
+    # Estimated Monthly Income: map either numeric codes or string patterns
+    estimated_monthly_income = case_when(
+      # numeric codes (if used)
+      salary_range %in% c(1, "1") ~ 2500,
+      salary_range %in% c(2, "2") ~ 4000,
+      salary_range %in% c(3, "3") ~ 6000,
+      salary_range %in% c(4, "4") ~ 10000,
+      # string patterns (examples: "0 - 20k", "20k - 40k", "40k - 60k", "60k+")
+      grepl("0\\s*[-–]\\s*20", salary_range_clean, ignore.case = TRUE) ~ 2000,
+      grepl("20\\s*[-–]\\s*40|20k\\s*[-–]\\s*40k", salary_range_clean, ignore.case = TRUE) ~ 4000,
+      grepl("40\\s*[-–]\\s*60|40k\\s*[-–]\\s*60k", salary_range_clean, ignore.case = TRUE) ~ 6000,
+      grepl("60\\s*\\+|60k", salary_range_clean, ignore.case = TRUE) ~ 10000,
+      TRUE ~ 4000
+    ),
+
+    # Loan Amount = car_value * (1 - downpayment fraction)
+    loan_amount = car_value * (1 - coalesce(size_of_downpayment, 0)),
+
+    # Monthly payment using 8% annual interest, assumed loan_length in months.
+    monthly_payment = if_else(
+      !is.na(loan_length) & loan_length > 0 & loan_amount > 0,
+      (loan_amount * (0.08/12) * (1 + 0.08/12)^loan_length) /
+        ((1 + 0.08/12)^loan_length - 1),
+      loan_amount / pmax(loan_length, 1)
+    ),
+
+    # guard against invalid values
+    monthly_payment = if_else(
+      is.na(monthly_payment) | is.infinite(monthly_payment) | monthly_payment <= 0,
+      loan_amount / pmax(loan_length, 1),
+      monthly_payment
+    ),
+
+    # payment to income ratio
+    payment_to_income = monthly_payment / pmax(estimated_monthly_income, 1),
+
+    # downpayment absolute amount
+    downpayment_amount = car_value * coalesce(size_of_downpayment, 0)
+  )
+
+cat("✓ Derived features created\n\n")
+
+# ----------------------------------------------------------------------------
+# 3.2 Ensure driver_tenure exists (if created earlier as NA it's fine)
+# ----------------------------------------------------------------------------
+
+if (!"driver_tenure" %in% names(data_features)) {
+  data_features <- data_features %>% mutate(driver_tenure = NA_real_)
+  cat("Note: created driver_tenure as NA.\n\n")
+} else {
+  cat("driver_tenure present (will be used as-is).\n\n")
+}
+
+# ----------------------------------------------------------------------------
+# 3.3 Select final 8 features and target (strict)
+# ----------------------------------------------------------------------------
+
+cat("=== 3.2 Final Feature Selection ===\n\n")
+
+feature_cols <- c(
+  "car_value",
+  "salary_range",            # keep original column (string or code) if you want; otherwise remove and use salary_range_clean
+  "debt_to_income_ratio",
+  "loan_length",
+  "repaid_loan_on_prev_car",
+  "driver_tenure",
+  "payment_to_income",
+  "downpayment_amount"
+)
+
+# Validate presence
+missing_feats <- setdiff(feature_cols, names(data_features))
+if (length(missing_feats) > 0) stop("Missing feature(s) in data_features: ", paste(missing_feats, collapse = ", "))
+
+data_final <- data_features %>%
+  select(all_of(feature_cols), repaid)
+
+# Convert repaid (already numeric 0/1) into factor for modeling
+data_final <- data_final %>%
+  mutate(
+    repaid = factor(repaid, levels = c(0,1), labels = c("Not_Repaid", "Repaid"))
+  )
+
+cat("✓ Final dataset created (8 features + repaid)\n\n")
+
+# ----------------------------------------------------------------------------
+# 3.4 Feature Summary Statistics & Quick validation
+# ----------------------------------------------------------------------------
+
+cat("=== 3.3 Feature Summary Statistics ===\n\n")
+
+# Numeric features stats
+numeric_cols <- data_final %>% select(where(is.numeric))
+if (ncol(numeric_cols) > 0) {
+  summary_stats_num <- numeric_cols %>%
+    summarise(across(everything(), list(
+      Mean = ~mean(., na.rm = TRUE),
+      SD   = ~sd(., na.rm = TRUE),
+      Min  = ~min(., na.rm = TRUE),
+      Max  = ~max(., na.rm = TRUE)
+    ), .names = "{.col}_{.fn}"))
+  summary_long_num <- summary_stats_num %>%
+    pivot_longer(everything(),
+                 names_to = c("Feature", "Stat"),
+                 names_sep = "_",
+                 values_to = "Value") %>%
+    pivot_wider(names_from = Stat, values_from = Value)
+  cat("Numeric features summary:\n")
+  print(summary_long_num)
+  cat("\n")
+} else {
+  cat("No numeric features found.\n\n")
+}
+
+# Categorical features summary
+cat("Categorical features summary:\n")
+cat_features <- data_final %>% select(where(is.factor))
+if (ncol(cat_features) > 0) {
+  for (colname in names(cat_features)) {
+    cat(sprintf("\n-- %s --\n", colname))
+    freq_tbl <- as.data.frame(table(cat_features[[colname]], useNA = "ifany"))
+    names(freq_tbl) <- c("Level", "Count")
+    freq_tbl$Pct <- round(100 * freq_tbl$Count / sum(freq_tbl$Count), 2)
+    print(freq_tbl)
+  }
+  cat("\n")
+} else {
+  cat("No categorical features found.\n\n")
+}
+
+# ----------------------------------------------------------------------------
+# 3.5 Multicollinearity check (numeric only)
+# ----------------------------------------------------------------------------
+
+cat("\n=== 3.4 Multicollinearity Check ===\n\n")
+numeric_data <- data_final %>% select(where(is.numeric))
+if (ncol(numeric_data) > 1) {
+  cor_matrix <- cor(numeric_data, use = "complete.obs")
+  cat("Correlation matrix (numeric features):\n")
+  print(round(cor_matrix, 3))
+} else {
+  cat("Not enough numeric features for correlation matrix.\n")
+}
+
+# ----------------------------------------------------------------------------
+# 3.6 Final validation checks
+# ----------------------------------------------------------------------------
+
+cat("\n=== 3.5 Validation Checks ===\n\n")
+cat(sprintf("Missing values (total): %d\n", sum(is.na(data_final))))
+cat(sprintf("Infinite values (predictors): %d\n",
+            sum(sapply(data_final %>% select(-repaid), function(x) sum(is.infinite(x))))))
+
+cat("\nTarget distribution:\n")
+print(table(data_final$repaid, useNA = "ifany"))
+
+cat("\n✓ STEP 3 COMPLETE\n\n")
+
+```
+
+
+STEP 4: Train-Test Split
+```{r}
+# ============================================================================
+# STEP 4: TRAIN-TEST SPLIT
+# ============================================================================
+
+cat(rep("=", 70), "\n", sep = "")
+cat("STEP 4: TRAIN-TEST SPLIT\n")
+cat(rep("=", 70), "\n\n", sep = "")
+
+# Set seed for reproducibility
+set.seed(42)
+
+# Create stratified split (70% train, 30% test)
+train_index <- createDataPartition(
+  data_final$repaid,
+  p = 0.7,
+  list = FALSE,
+  times = 1
+)
+
+# Split data
+train_data <- data_final[train_index, ]
+test_data <- data_final[-train_index, ]
+
+# Display split information
+cat("Data split summary:\n")
+cat(sprintf("  Total observations: %d\n", nrow(data_final)))
+cat(sprintf("  Training set: %d (%.1f%%)\n", 
+            nrow(train_data), 
+            nrow(train_data) / nrow(data_final) * 100))
+cat(sprintf("  Test set: %d (%.1f%%)\n\n", 
+            nrow(test_data), 
+            nrow(test_data) / nrow(data_final) * 100))
+
+# Check class distribution in both sets
+cat("Training set distribution:\n")
+print(table(train_data$repaid))
+cat(sprintf("  Repayment rate: %.2f%%\n\n", 
+            mean(train_data$repaid == "Repaid") * 100))
+
+cat("Test set distribution:\n")
+print(table(test_data$repaid))
+cat(sprintf("  Repayment rate: %.2f%%\n", 
+            mean(test_data$repaid == "Repaid") * 100))
+
+cat("\n✓ STEP 4 COMPLETE\n\n")
+
+```
+STEP 5: Model 1 - Logistic Regression
+
+
+```{r}
+# ============================================================================
+# STEP 5: LOGISTIC REGRESSION (10-fold CV, NA-safe)
+# ============================================================================
+
+suppressPackageStartupMessages({
+  library(caret)
+  library(dplyr)
+  library(pROC)
+})
+
+cat(rep("=", 70), "\n")
+cat("STEP 5: LOGISTIC REGRESSION\n")
+cat(rep("=", 70), "\n\n")
+
+train_df <- train_data
+test_df  <- test_data
+
+# ----------------------------------------
+# Ensure repaid is factor with 2 levels
+# ----------------------------------------
+if (!is.factor(train_df$repaid)) {
+  stop("ERROR: repaid is not factor in train_df — check STEP 2/3")
+}
+
+if (length(levels(train_df$repaid)) != 2) {
+  stop("ERROR: repaid has less than 2 classes in train_df — cannot train classifier")
+}
+
+cat("✓ repaid factor OK\n\n")
+
+# ----------------------------------------
+# Fill predictor NA (numeric median / categorical 'Missing')
+# ----------------------------------------
+num_cols <- names(train_df)[sapply(train_df, is.numeric) & names(train_df)!="repaid"]
+cat_cols <- setdiff(names(train_df), c(num_cols,"repaid"))
+
+for(cn in num_cols){
+  med <- median(train_df[[cn]], na.rm=TRUE)
+  if(is.na(med)) med <- 0
+  train_df[[cn]][is.na(train_df[[cn]])] <- med
+  test_df [[cn]][is.na(test_df[[cn]])] <- med
+}
+
+for(cn in cat_cols){
+  # convert to character before factor
+  train_df[[cn]] <- as.character(train_df[[cn]])
+  test_df [[cn]] <- as.character(test_df [[cn]])
+  train_df[[cn]][is.na(train_df[[cn]])] <- "Missing"
+  test_df [[cn]][is.na(test_df [[cn]])] <- "Missing"
+  lv <- unique(train_df[[cn]])
+  train_df[[cn]] <- factor(train_df[[cn]], levels=lv)
+  test_df [[cn]] <- factor(test_df [[cn]], levels=lv)
+}
+
+cat("✓ NA imputed & factor levels aligned\n\n")
+
+# ----------------------------------------
+# caret training control
+# ----------------------------------------
+train_control <- trainControl(
+  method="cv",
+  number=10,
+  classProbs=TRUE,
+  summaryFunction=twoClassSummary,
+  savePredictions="final"
+)
+
+# ----------------------------------------
+# Train GLM Logistic Regression
+# ----------------------------------------
+cat("Training logistic regression...\n")
+
+predictors <- setdiff(names(train_df), "repaid")
+
+lr_model <- train(
+  reformulate(predictors, "repaid"),
+  data=train_df,
+  method="glm",
+  family="binomial",
+  trControl=train_control,
+  metric="ROC"
+)
+
+cat("✓ Model trained\n\n")
+
+# ----------------------------------------
+# Coefficients & Odds Ratios
+# ----------------------------------------
+cat("Coefficients:\n")
+print(coef(summary(lr_model$finalModel)))
+
+cat("\nOdds ratios:\n")
+odds_ratios <- exp(coef(lr_model$finalModel))
+print(odds_ratios)
+
+# ----------------------------------------
+# TEST performance
+# ----------------------------------------
+test_pred_prob <- predict(lr_model, test_df, type="prob")
+test_pred <- predict(lr_model, test_df, type="raw")
+
+cm_test <- confusionMatrix(test_pred, test_df$repaid, positive="Repaid")
+
+cat("\nTEST Confusion Matrix:\n")
+print(cm_test$table)
+
+cat("\nTEST Metrics:\n")
+print(cm_test$overall)
+print(cm_test$byClass)
+
+roc_test <- roc(test_df$repaid, test_pred_prob$Repaid, quiet=TRUE)
+cat(sprintf("\nTEST ROC-AUC: %.4f\n", auc(roc_test)))
+
+# ----------------------------------------
+# TRAIN performance
+# ----------------------------------------
+train_pred_prob <- predict(lr_model, train_df, type="prob")
+train_pred <- predict(lr_model, train_df, type="raw")
+cm_train <- confusionMatrix(train_pred, train_df$repaid, positive="Repaid")
+
+cat("\nTRAIN Confusion Matrix:\n")
+print(cm_train$table)
+
+cat("\nTRAIN Metrics:\n")
+print(cm_train$overall)
+print(cm_train$byClass)
+
+roc_train <- roc(train_df$repaid, train_pred_prob$Repaid, quiet=TRUE)
+cat(sprintf("\nTRAIN ROC-AUC: %.4f\n", auc(roc_train)))
+
+cat("\n✓ STEP 5 Completed\n\n")
+
+
+```
+
+
+
+STEP 6: Model 2 - Random Forest
+```{r}
+# ============================================================================
+# STEP 6: MODEL 2 - RANDOM FOREST (mtry = 2,3; prints TRAIN & TEST metrics)
+# Full, drop-in script — assumes `train_data` and `test_data` already exist.
+# ============================================================================
+
+suppressPackageStartupMessages({
+  library(caret)
+  library(dplyr)
+  library(pROC)
+  library(randomForest)
+})
+
+set.seed(42)
+
+OUT_DIR_RF <- file.path(getwd(), "model_rf_outputs")
+dir.create(OUT_DIR_RF, recursive = TRUE, showWarnings = FALSE)
+
+cat(rep("=", 70), "\n")
+cat("STEP 6: MODEL 2 - RANDOM FOREST (mtry = 2,3)\n")
+cat(rep("=", 70), "\n\n")
+
+# ---------------------------
+# Pre-checks
+# ---------------------------
+if (!exists("train_data") || !exists("test_data")) stop("train_data and test_data must exist. Run STEP 4 first.")
+
+cat(sprintf("Train rows: %d, Test rows: %d\n\n", nrow(train_data), nrow(test_data)))
+
+# Ensure target exists & is factor with two levels
+if (!"repaid" %in% names(train_data)) stop("train_data must contain 'repaid' column.")
+if (!is.factor(train_data$repaid)) {
+  train_data$repaid <- factor(train_data$repaid, levels = c(0,1), labels = c("Not_Repaid","Repaid"))
+  warning("Converted train_data$repaid to factor (Not_Repaid, Repaid).")
+}
+if (length(levels(train_data$repaid)) != 2) stop("train_data$repaid must have 2 levels.")
+
+# For test_data: if labeled, coerce similarly (if all NA, keep as-is)
+if ("repaid" %in% names(test_data) && !is.factor(test_data$repaid) && any(!is.na(test_data$repaid))) {
+  test_data$repaid <- factor(test_data$repaid, levels = c(0,1), labels = c("Not_Repaid","Repaid"))
+  warning("Converted test_data$repaid to factor (Not_Repaid, Repaid).")
+}
+
+# ---------------------------
+# Minimal NA handling for predictors
+# ---------------------------
+predictor_cols <- setdiff(names(train_data), "repaid")
+if (length(predictor_cols) == 0) stop("No predictors found in train_data (only 'repaid').")
+
+num_cols <- predictor_cols[sapply(train_data[predictor_cols], is.numeric)]
+cat_cols <- setdiff(predictor_cols, num_cols)
+
+# numeric median impute
+for (cn in num_cols) {
+  med <- median(train_data[[cn]], na.rm = TRUE)
+  if (is.na(med)) med <- 0
+  train_data[[cn]][is.na(train_data[[cn]])] <- med
+  if (cn %in% names(test_data) && is.numeric(test_data[[cn]])) {
+    test_data[[cn]][is.na(test_data[[cn]])] <- med
+  }
+}
+
+# categorical fill and align levels
+for (cn in cat_cols) {
+  train_data[[cn]] <- as.character(train_data[[cn]])
+  train_data[[cn]][is.na(train_data[[cn]])] <- "Missing"
+  train_levels <- unique(train_data[[cn]])
+  train_levels <- c(setdiff(train_levels, "Missing"), "Missing")
+  train_data[[cn]] <- factor(train_data[[cn]], levels = train_levels)
+
+  if (cn %in% names(test_data)) {
+    test_data[[cn]] <- as.character(test_data[[cn]])
+    test_data[[cn]][is.na(test_data[[cn]])] <- "Missing"
+    # unfamiliar test levels mapped to "Missing"
+    test_data[[cn]][!(test_data[[cn]] %in% train_levels)] <- "Missing"
+    test_data[[cn]] <- factor(test_data[[cn]], levels = train_levels)
+  }
+}
+
+cat("NA imputation & factor alignment complete.\n\n")
+
+# ---------------------------
+# trainControl (10-fold CV)
+# ---------------------------
+train_control_rf <- trainControl(
+  method = "cv",
+  number = 10,
+  classProbs = TRUE,
+  summaryFunction = twoClassSummary,
+  savePredictions = "final",
+  verboseIter = TRUE
+)
+
+cat("Using 10-fold CV and classProbs = TRUE\n\n")
+
+# ---------------------------
+# mtry grid: only 2 and 3
+# ---------------------------
+tune_grid_rf <- expand.grid(mtry = c(2, 3))
+cat("mtry grid:\n"); print(tune_grid_rf); cat("\n")
+
+# ---------------------------
+# Train Random Forest
+# ---------------------------
+cat("Training Random Forest...\n")
+start_time <- Sys.time()
+set.seed(42)
+
+rf_model <- train(
+  form = as.formula(paste("repaid ~", paste(predictor_cols, collapse = " + "))),
+  data = train_data,
+  method = "rf",
+  trControl = train_control_rf,
+  tuneGrid = tune_grid_rf,
+  metric = "ROC",
+  ntree = 400,
+  importance = TRUE,
+  nodesize = 10,
+  maxnodes = 50
+)
+
+end_time <- Sys.time()
+elapsed <- as.numeric(difftime(end_time, start_time, units = "secs"))
+cat(sprintf("\nRF training completed in %.2f seconds\n\n", elapsed))
+
+# ---------------------------
+# Model summary & var importance
+# ---------------------------
+cat("Best tuning parameters:\n"); print(rf_model$bestTune); cat("\n")
+cat("Model summary:\n"); print(rf_model); cat("\n")
+
+cat("Variable importance:\n")
+rf_imp <- varImp(rf_model, scale = TRUE)
+print(rf_imp)
+write.csv(as.data.frame(rf_imp$importance), file.path(OUT_DIR_RF, "rf_variable_importance.csv"), row.names = TRUE)
+cat("Saved variable importance to:", file.path(OUT_DIR_RF, "rf_variable_importance.csv"), "\n\n")
+
+# ---------------------------
+# Predictions & Metrics: TRAIN + TEST (both printed and saved)
+# ---------------------------
+
+cat("Evaluating TRAIN set...\n")
+train_pred_prob <- predict(rf_model, newdata = train_data, type = "prob")
+train_pred_class <- predict(rf_model, newdata = train_data, type = "raw")
+
+if ("repaid" %in% names(train_data) && any(!is.na(train_data$repaid))) {
+  cm_train <- confusionMatrix(train_pred_class, train_data$repaid, positive = "Repaid")
+  cat("\nTRAIN Confusion Matrix:\n"); print(cm_train$table)
+  cat("\nTRAIN Metrics:\n")
+  cat(sprintf("  Accuracy:    %.4f\n", as.numeric(cm_train$overall["Accuracy"])))
+  cat(sprintf("  Sensitivity: %.4f\n", as.numeric(cm_train$byClass["Sensitivity"])))
+  cat(sprintf("  Specificity: %.4f\n", as.numeric(cm_train$byClass["Specificity"])))
+  cat(sprintf("  Precision:   %.4f\n", as.numeric(cm_train$byClass["Precision"])))
+  cat(sprintf("  F1 Score:    %.4f\n", as.numeric(cm_train$byClass["F1"])))
+
+  # ROC-AUC train
+  if (is.data.frame(train_pred_prob) && "Repaid" %in% colnames(train_pred_prob)) {
+    roc_train <- tryCatch(roc(response = as.numeric(train_data$repaid == "Repaid"),
+                              predictor = as.numeric(train_pred_prob[,"Repaid"]), quiet = TRUE), error = function(e) NULL)
+    if (!is.null(roc_train)) {
+      cat(sprintf("  ROC-AUC:     %.4f\n", as.numeric(auc(roc_train))))
+      png(file.path(OUT_DIR_RF, "rf_train_roc.png"), width = 800, height = 600)
+      plot(roc_train, main = sprintf("RF Train ROC (AUC=%.4f)", auc(roc_train)))
+      dev.off()
+      cat("Saved train ROC to:", file.path(OUT_DIR_RF, "rf_train_roc.png"), "\n")
+    } else {
+      cat("  ROC-AUC:     (could not compute train ROC)\n")
+    }
+  } else {
+    cat("  ROC-AUC:     (train probabilities for 'Repaid' not available)\n")
+  }
+} else {
+  cat("No labeled train rows available; skipping train metrics.\n")
+}
+
+cat("\nEvaluating TEST set...\n")
+test_pred_prob <- predict(rf_model, newdata = test_data, type = "prob")
+test_pred_class <- predict(rf_model, newdata = test_data, type = "raw")
+
+if ("repaid" %in% names(test_data) && any(!is.na(test_data$repaid))) {
+  cm_test <- confusionMatrix(test_pred_class, test_data$repaid, positive = "Repaid")
+  cat("\nTEST Confusion Matrix:\n"); print(cm_test$table)
+  cat("\nTEST Metrics:\n")
+  cat(sprintf("  Accuracy:    %.4f\n", as.numeric(cm_test$overall["Accuracy"])))
+  cat(sprintf("  Sensitivity: %.4f\n", as.numeric(cm_test$byClass["Sensitivity"])))
+  cat(sprintf("  Specificity: %.4f\n", as.numeric(cm_test$byClass["Specificity"])))
+  cat(sprintf("  Precision:   %.4f\n", as.numeric(cm_test$byClass["Precision"])))
+  cat(sprintf("  F1 Score:    %.4f\n", as.numeric(cm_test$byClass["F1"])))
+
+  # ROC-AUC test
+  if (is.data.frame(test_pred_prob) && "Repaid" %in% colnames(test_pred_prob)) {
+    roc_test <- tryCatch(roc(response = as.numeric(test_data$repaid == "Repaid"),
+                             predictor = as.numeric(test_pred_prob[,"Repaid"]), quiet = TRUE), error = function(e) NULL)
+    if (!is.null(roc_test)) {
+      cat(sprintf("  ROC-AUC:     %.4f\n", as.numeric(auc(roc_test))))
+      png(file.path(OUT_DIR_RF, "rf_test_roc.png"), width = 800, height = 600)
+      plot(roc_test, main = sprintf("RF Test ROC (AUC=%.4f)", auc(roc_test)))
+      dev.off()
+      cat("Saved test ROC to:", file.path(OUT_DIR_RF, "rf_test_roc.png"), "\n")
+    } else {
+      cat("  ROC-AUC:     (could not compute test ROC)\n")
+    }
+  } else {
+    cat("  ROC-AUC:     (test probabilities for 'Repaid' not available)\n")
+  }
+} else {
+  cat("No labeled test rows available; skipping test metrics.\n")
+}
+
+# ---------------------------
+# Print first 10 rows of train & test (for quick inspection)
+# ---------------------------
+cat("\n=== TRAIN DATA (first 10 rows) ===\n"); print(head(train_data, 10))
+cat("\n=== TEST DATA (first 10 rows) ===\n");  print(head(test_data, 10))
+
+# ---------------------------
+# Save predictions & artifacts
+# ---------------------------
+train_out <- train_data
+train_out$pred_class <- as.character(train_pred_class)
+train_out$prob_Repaid <- if (is.data.frame(train_pred_prob) && "Repaid" %in% colnames(train_pred_prob)) as.numeric(train_pred_prob[,"Repaid"]) else NA_real_
+write.csv(train_out, file.path(OUT_DIR_RF, "train_with_rf_predictions.csv"), row.names = FALSE)
+
+test_out <- test_data
+test_out$pred_class <- as.character(test_pred_class)
+test_out$prob_Repaid <- if (is.data.frame(test_pred_prob) && "Repaid" %in% colnames(test_pred_prob)) as.numeric(test_pred_prob[,"Repaid"]) else NA_real_
+write.csv(test_out, file.path(OUT_DIR_RF, "test_with_rf_predictions.csv"), row.names = FALSE)
+
+saveRDS(rf_model, file.path(OUT_DIR_RF, "rf_model.rds"))
+cat("\nSaved train/test predictions and model to:", normalizePath(OUT_DIR_RF), "\n")
+cat("\n✓ STEP 6 COMPLETE\n\n")
+
+
+```
+
+
+
+STEP 7: Model 3 - XGBoost
+```{r}
+# ============================================================================
+# STEP 7: MODEL 3 - XGBOOST (NA-safe, 10-fold CV, prints TRAIN & TEST metrics)
+# Full drop-in block — expects train_data and test_data to exist
+# ============================================================================
+
+suppressPackageStartupMessages({
+  library(caret)
+  library(dplyr)
+  library(pROC)
+  library(xgboost)
+})
+
+set.seed(42)
+
+OUT_DIR_XGB <- file.path(getwd(), "model_xgb_outputs")
+dir.create(OUT_DIR_XGB, recursive = TRUE, showWarnings = FALSE)
+
+cat(rep("=", 70), "\n")
+cat("STEP 7: MODEL 3 - XGBOOST\n")
+cat(rep("=", 70), "\n\n")
+
+# ---------------------------
+# Pre-checks
+# ---------------------------
+if (!exists("train_data") || !exists("test_data")) stop("train_data and test_data must exist. Run STEP 4 first.")
+cat(sprintf("Train rows: %d, Test rows: %d\n\n", nrow(train_data), nrow(test_data)))
+
+if (!"repaid" %in% names(train_data)) stop("train_data must contain 'repaid' column.")
+# Ensure factor levels for caret
+if (!is.factor(train_data$repaid)) {
+  train_data$repaid <- factor(train_data$repaid, levels = c(0,1), labels = c("Not_Repaid","Repaid"))
+  warning("Converted train_data$repaid to factor (Not_Repaid, Repaid).")
+}
+if (length(levels(train_data$repaid)) != 2) stop("train_data$repaid must have two classes.")
+
+if ("repaid" %in% names(test_data) && any(!is.na(test_data$repaid)) && !is.factor(test_data$repaid)) {
+  test_data$repaid <- factor(test_data$repaid, levels = c(0,1), labels = c("Not_Repaid","Repaid"))
+  warning("Converted test_data$repaid to factor (Not_Repaid, Repaid).")
+}
+
+# ---------------------------
+# Minimal NA handling for predictors
+# ---------------------------
+predictor_cols <- setdiff(names(train_data), "repaid")
+if (length(predictor_cols) == 0) stop("No predictors found in train_data (only 'repaid').")
+
+num_cols <- predictor_cols[sapply(train_data[predictor_cols], is.numeric)]
+cat_cols <- setdiff(predictor_cols, num_cols)
+
+# Numeric median impute (train -> test)
+for (cn in num_cols) {
+  med <- median(train_data[[cn]], na.rm = TRUE)
+  if (is.na(med)) med <- 0
+  train_data[[cn]][is.na(train_data[[cn]])] <- med
+  if (cn %in% names(test_data) && is.numeric(test_data[[cn]])) {
+    test_data[[cn]][is.na(test_data[[cn]])] <- med
+  }
+}
+
+# Categorical fill + align levels
+for (cn in cat_cols) {
+  train_data[[cn]] <- as.character(train_data[[cn]])
+  train_data[[cn]][is.na(train_data[[cn]])] <- "Missing"
+  train_levels <- unique(train_data[[cn]])
+  train_levels <- c(setdiff(train_levels, "Missing"), "Missing")
+  train_data[[cn]] <- factor(train_data[[cn]], levels = train_levels)
+
+  if (cn %in% names(test_data)) {
+    test_data[[cn]] <- as.character(test_data[[cn]])
+    test_data[[cn]][is.na(test_data[[cn]])] <- "Missing"
+    # unseen test levels -> "Missing"
+    test_data[[cn]][!(test_data[[cn]] %in% train_levels)] <- "Missing"
+    test_data[[cn]] <- factor(test_data[[cn]], levels = train_levels)
+  }
+}
+
+cat("NA imputation & categorical level alignment complete.\n\n")
+
+# ---------------------------
+# Train control (10-fold CV)
+# ---------------------------
+train_control_xgb <- trainControl(
+  method = "cv",
+  number = 10,
+  classProbs = TRUE,
+  summaryFunction = twoClassSummary,
+  savePredictions = "final",
+  verboseIter = TRUE
+)
+
+cat("Using 10-fold CV (classProbs=TRUE)\n\n")
+
+# ---------------------------
+# Tuning grid (kept moderate)
+# ---------------------------
+tune_grid_xgb <- expand.grid(
+  nrounds = c(100, 200),
+  max_depth = c(3, 5),
+  eta = c(0.01, 0.1),
+  gamma = 0,
+  colsample_bytree = 0.8,
+  min_child_weight = 1,
+  subsample = 0.8
+)
+
+cat("XGBoost tuning grid (rows):", nrow(tune_grid_xgb), "\n")
+print(tune_grid_xgb)
+cat("\n")
+
+# ---------------------------
+# Train model
+# ---------------------------
+cat("Training XGBoost model (this may take a few minutes)...\n")
+set.seed(42)
+start_time <- Sys.time()
+
+xgb_model <- train(
+  form = as.formula(paste("repaid ~", paste(predictor_cols, collapse = " + "))),
+  data = train_data,
+  method = "xgbTree",
+  trControl = train_control_xgb,
+  tuneGrid = tune_grid_xgb,
+  metric = "ROC",
+  verbosity = 0
+)
+
+end_time <- Sys.time()
+elapsed <- as.numeric(difftime(end_time, start_time, units = "secs"))
+cat(sprintf("Training completed in %.2f seconds\n\n", elapsed))
+
+# ---------------------------
+# Summary & variable importance
+# ---------------------------
+cat("XGBoost model summary:\n")
+print(xgb_model)
+cat("\nBest parameters:\n"); print(xgb_model$bestTune); cat("\n")
+
+cat("Variable importance (caret::varImp):\n")
+var_imp_xgb <- varImp(xgb_model, scale = TRUE)
+print(var_imp_xgb)
+write.csv(as.data.frame(var_imp_xgb$importance), file.path(OUT_DIR_XGB, "xgb_variable_importance.csv"), row.names = TRUE)
+cat("Saved variable importance to:", file.path(OUT_DIR_XGB, "xgb_variable_importance.csv"), "\n\n")
+
+# ---------------------------
+# Predictions & metrics (TRAIN + TEST)
+# ---------------------------
+
+# TRAIN predictions
+cat("Evaluating TRAIN set...\n")
+train_pred_prob <- predict(xgb_model, newdata = train_data, type = "prob")
+train_pred_class <- predict(xgb_model, newdata = train_data, type = "raw")
+
+if ("repaid" %in% names(train_data) && any(!is.na(train_data$repaid))) {
+  cm_train <- confusionMatrix(train_pred_class, train_data$repaid, positive = "Repaid")
+  cat("\nTRAIN Confusion Matrix:\n"); print(cm_train$table)
+  cat("\nTRAIN Metrics:\n")
+  cat(sprintf("  Accuracy:    %.4f\n", as.numeric(cm_train$overall["Accuracy"])))
+  cat(sprintf("  Sensitivity: %.4f\n", as.numeric(cm_train$byClass["Sensitivity"])))
+  cat(sprintf("  Specificity: %.4f\n", as.numeric(cm_train$byClass["Specificity"])))
+  cat(sprintf("  Precision:   %.4f\n", as.numeric(cm_train$byClass["Precision"])))
+  cat(sprintf("  F1 Score:    %.4f\n", as.numeric(cm_train$byClass["F1"])))
+
+  if (is.data.frame(train_pred_prob) && "Repaid" %in% colnames(train_pred_prob)) {
+    roc_train <- tryCatch(roc(response = as.numeric(train_data$repaid == "Repaid"),
+                              predictor = as.numeric(train_pred_prob[,"Repaid"]), quiet = TRUE),
+                          error = function(e) NULL)
+    if (!is.null(roc_train)) {
+      cat(sprintf("  ROC-AUC (TRAIN): %.4f\n", as.numeric(auc(roc_train))))
+      png(file.path(OUT_DIR_XGB, "xgb_train_roc.png"), width = 800, height = 600)
+      plot(roc_train, main = sprintf("XGBoost Train ROC (AUC=%.4f)", auc(roc_train)))
+      dev.off()
+      cat("Saved train ROC to:", file.path(OUT_DIR_XGB, "xgb_train_roc.png"), "\n")
+    }
+  }
+} else {
+  cat("No labeled train rows available; skipping train metrics.\n")
+}
+
+# TEST predictions
+cat("\nEvaluating TEST set...\n")
+test_pred_prob <- predict(xgb_model, newdata = test_data, type = "prob")
+test_pred_class <- predict(xgb_model, newdata = test_data, type = "raw")
+
+if ("repaid" %in% names(test_data) && any(!is.na(test_data$repaid))) {
+  cm_test <- confusionMatrix(test_pred_class, test_data$repaid, positive = "Repaid")
+  cat("\nTEST Confusion Matrix:\n"); print(cm_test$table)
+  cat("\nTEST Metrics:\n")
+  cat(sprintf("  Accuracy:    %.4f\n", as.numeric(cm_test$overall["Accuracy"])))
+  cat(sprintf("  Sensitivity: %.4f\n", as.numeric(cm_test$byClass["Sensitivity"])))
+  cat(sprintf("  Specificity: %.4f\n", as.numeric(cm_test$byClass["Specificity"])))
+  cat(sprintf("  Precision:   %.4f\n", as.numeric(cm_test$byClass["Precision"])))
+  cat(sprintf("  F1 Score:    %.4f\n", as.numeric(cm_test$byClass["F1"])))
+
+  if (is.data.frame(test_pred_prob) && "Repaid" %in% colnames(test_pred_prob)) {
+    roc_test <- tryCatch(roc(response = as.numeric(test_data$repaid == "Repaid"),
+                             predictor = as.numeric(test_pred_prob[,"Repaid"]), quiet = TRUE),
+                         error = function(e) NULL)
+    if (!is.null(roc_test)) {
+      cat(sprintf("  ROC-AUC (TEST): %.4f\n", as.numeric(auc(roc_test))))
+      png(file.path(OUT_DIR_XGB, "xgb_test_roc.png"), width = 800, height = 600)
+      plot(roc_test, main = sprintf("XGBoost Test ROC (AUC=%.4f)", auc(roc_test)))
+      dev.off()
+      cat("Saved test ROC to:", file.path(OUT_DIR_XGB, "xgb_test_roc.png"), "\n")
+    }
+  }
+} else {
+  cat("No labeled test rows available; skipping test metrics.\n")
+}
+
+# ---------------------------
+# Print first 10 rows of train & test
+# ---------------------------
+cat("\n=== TRAIN DATA (first 10 rows) ===\n"); print(head(train_data, 10))
+cat("\n=== TEST DATA (first 10 rows) ===\n");  print(head(test_data, 10))
+
+# ---------------------------
+# Save predictions & model
+# ---------------------------
+train_out <- train_data
+train_out$pred_class <- as.character(train_pred_class)
+train_out$prob_Repaid <- if (is.data.frame(train_pred_prob) && "Repaid" %in% colnames(train_pred_prob)) as.numeric(train_pred_prob[,"Repaid"]) else NA_real_
+write.csv(train_out, file.path(OUT_DIR_XGB, "train_with_xgb_predictions.csv"), row.names = FALSE)
+
+test_out <- test_data
+test_out$pred_class <- as.character(test_pred_class)
+test_out$prob_Repaid <- if (is.data.frame(test_pred_prob) && "Repaid" %in% colnames(test_pred_prob)) as.numeric(test_pred_prob[,"Repaid"]) else NA_real_
+write.csv(test_out, file.path(OUT_DIR_XGB, "test_with_xgb_predictions.csv"), row.names = FALSE)
+
+saveRDS(xgb_model, file.path(OUT_DIR_XGB, "xgb_model.rds"))
+
+cat("\nSaved predictions and model to:", normalizePath(OUT_DIR_XGB), "\n")
+cat("\n✓ STEP 7 COMPLETE\n\n")
+
+
+```
+
+STEP 8: Model Comparison & Evaluation
+```{r}
+# ============================================================================
+# STEP 8: MODEL COMPARISON AND EVALUATION (Robust)
+# - Compares available models on the TEST set
+# - Recomputes preds/probs if needed
+# ============================================================================
+suppressPackageStartupMessages({
+  library(caret)
+  library(dplyr)
+  library(pROC)
+})
+
+cat(rep("=", 70), "\n")
+cat("STEP 8: MODEL COMPARISON AND EVALUATION (Robust)\n")
+cat(rep("=", 70), "\n\n")
+
+# Create summary directory (keep previous variable name compatibility)
+SUMMARY_DIR <- file.path(getwd(), "model_comparison_summary")
+dir.create(SUMMARY_DIR, showWarnings = FALSE, recursive = TRUE)
+
+# ---------------------------
+# Basic checks
+# ---------------------------
+if (!exists("test_data")) stop("Error: test_data not found. Please run STEP 4 and ensure test_data exists.")
+if (!"repaid" %in% names(test_data)) stop("Error: test_data must contain 'repaid' column for evaluation.")
+
+# Helper: safe predict class & prob for caret model or existing vars
+get_preds_from_model <- function(model_name, model_obj = NULL, test_df) {
+  # Returns list(success, pred_class, pred_prob, message)
+  res <- list(success = FALSE, pred_class = NULL, pred_prob = NULL, message = NULL)
+  tryCatch({
+    if (!is.null(model_obj)) {
+      # compute class and prob via predict (caret-compatible)
+      pred_class <- tryCatch(predict(model_obj, newdata = test_df, type = "raw"), error = function(e) NULL)
+      pred_prob  <- tryCatch(predict(model_obj, newdata = test_df, type = "prob"), error = function(e) NULL)
+      res$pred_class <- pred_class
+      res$pred_prob  <- pred_prob
+      res$success <- TRUE
+    } else {
+      res$message <- "No model object provided"
+    }
+  }, error = function(e){
+    res$success <- FALSE
+    res$message <- paste("Predict error:", e$message)
+  })
+  return(res)
+}
+
+# ---------------------------
+# Models to check (support alternate naming: lr_model/logit_model, etc.)
+# ---------------------------
+model_map <- list(
+  "Logistic Regression" = if (exists("lr_model")) lr_model else if (exists("logit_model")) logit_model else NULL,
+  "Random Forest"       = if (exists("rf_model")) rf_model else NULL,
+  "XGBoost"             = if (exists("xgb_model")) xgb_model else NULL
+)
+
+# Also accept precomputed preds/probs if available
+# support both lr_pred/logit_pred naming
+precomp_preds <- list(
+  "Logistic Regression" = list(
+    class = if (exists("lr_pred")) lr_pred else if (exists("logit_pred")) logit_pred else NULL,
+    prob  = if (exists("lr_pred_prob")) lr_pred_prob else if (exists("logit_pred_prob")) logit_pred_prob else NULL
+  ),
+  "Random Forest" = list(
+    class = if (exists("rf_pred")) rf_pred else NULL,
+    prob  = if (exists("rf_pred_prob")) rf_pred_prob else NULL
+  ),
+  "XGBoost" = list(
+    class = if (exists("xgb_pred")) xgb_pred else NULL,
+    prob  = if (exists("xgb_pred_prob")) xgb_pred_prob else NULL
+  )
+)
+
+# Determine available models (either model object exists or precomputed preds exist)
+available_models <- c()
+for (mn in names(model_map)) {
+  if (!is.null(model_map[[mn]]) || (!is.null(precomp_preds[[mn]]$class) || !is.null(precomp_preds[[mn]]$prob))) {
+    available_models <- c(available_models, mn)
+  }
+}
+
+if (length(available_models) == 0) stop("No models or precomputed predictions found (lr_model/logit_model, rf_model, xgb_model or lr_pred etc.).")
+
+cat("Models to be compared:\n")
+print(available_models)
+cat("\n")
+
+# ---------------------------
+# Compute metrics per model (on TEST set)
+# ---------------------------
+results_list <- list()
+roc_objects <- list()
+
+for (mn in available_models) {
+  cat("Processing model:", mn, "...\n")
+  model_obj <- model_map[[mn]]
+  # start with precomputed preds if present
+  pred_class <- NULL
+  pred_prob  <- NULL
+
+  if (!is.null(precomp_preds[[mn]]$class)) {
+    pred_class <- precomp_preds[[mn]]$class
+  }
+  if (!is.null(precomp_preds[[mn]]$prob)) {
+    pred_prob <- precomp_preds[[mn]]$prob
+  }
+
+  # If missing, try to compute from model object
+  if (is.null(pred_class) || is.null(pred_prob)) {
+    if (!is.null(model_obj)) {
+      pr <- get_preds_from_model(mn, model_obj, test_data)
+      if (pr$success) {
+        if (is.null(pred_class) && !is.null(pr$pred_class)) pred_class <- pr$pred_class
+        if (is.null(pred_prob)  && !is.null(pr$pred_prob))  pred_prob  <- pr$pred_prob
+      } else {
+        warning(sprintf("Could not generate preds for %s: %s", mn, pr$message))
+      }
+    } else {
+      warning(sprintf("No model object for %s and no precomputed preds found.", mn))
+    }
+  }
+
+  # Validate presence of predicted class; if still null, skip model
+  if (is.null(pred_class)) {
+    warning(sprintf("Skipping %s: predicted classes not available.", mn))
+    next
+  }
+
+  # Ensure pred_class is factor with same levels as test_data$repaid if possible
+  if (!is.factor(pred_class)) {
+    pred_class <- as.character(pred_class)
+    if (all(pred_class %in% c("Repaid","Not_Repaid"))) {
+      pred_class <- factor(pred_class, levels = c("Not_Repaid","Repaid"))
+    } else if (all(pred_class %in% c("0","1","0.0","1.0"))) {
+      pred_class[pred_class %in% c("0","0.0")] <- "Not_Repaid"
+      pred_class[pred_class %in% c("1","1.0")] <- "Repaid"
+      pred_class <- factor(pred_class, levels = c("Not_Repaid","Repaid"))
+    } else {
+      # try align to test_data levels
+      try({
+        pred_class <- factor(as.character(pred_class), levels = levels(test_data$repaid))
+      }, silent = TRUE)
+    }
+  }
+
+  # Compute confusionMatrix only if test labels exist and are not all NA
+  metrics <- list()
+  if (!all(is.na(test_data$repaid))) {
+    # if pred_class length mismatch, warn and continue
+    if (length(pred_class) != nrow(test_data)) {
+      warning(sprintf("%s: length(pred_class) != nrow(test_data) — skipping metrics for this model.", mn))
+      next
+    }
+    actual <- test_data$repaid
+    if (!is.factor(actual)) actual <- factor(actual)
+    # align levels if needed
+    if (!all(levels(pred_class) %in% levels(actual))) {
+      pred_class <- factor(as.character(pred_class), levels = levels(actual))
+    }
+
+    cm <- tryCatch(confusionMatrix(pred_class, actual, positive = "Repaid"), error = function(e) NULL)
+    if (is.null(cm)) {
+      warning(sprintf("%s: confusionMatrix failed — skipping.", mn))
+      next
+    }
+    metrics$Accuracy    <- as.numeric(cm$overall["Accuracy"])
+    metrics$Sensitivity <- as.numeric(cm$byClass["Sensitivity"])
+    metrics$Specificity <- as.numeric(cm$byClass["Specificity"])
+    metrics$Precision   <- as.numeric(cm$byClass["Precision"])
+    metrics$F1_Score    <- as.numeric(cm$byClass["F1"])
+    metrics$Confusion   <- cm$table
+  } else {
+    warning(sprintf("test_data has no labels (all NA). Skipping confusion/metrics for %s.", mn))
+  }
+
+  # ROC-AUC: need numeric probability for positive class "Repaid"
+  auc_val <- NA_real_
+  roc_obj <- NULL
+  if (!is.null(pred_prob) && is.data.frame(pred_prob) && "Repaid" %in% colnames(pred_prob) && !all(is.na(test_data$repaid))) {
+    if (nrow(pred_prob) == nrow(test_data)) {
+      roc_obj <- tryCatch(roc(response = as.numeric(test_data$repaid == "Repaid"),
+                              predictor = as.numeric(pred_prob[,"Repaid"]), quiet = TRUE), error = function(e) NULL)
+      if (!is.null(roc_obj)) {
+        auc_val <- as.numeric(auc(roc_obj))
+      }
+    } else {
+      warning(sprintf("%s: predicted-prob length != nrow(test_data), cannot compute ROC.", mn))
+    }
+  } else {
+    if (!is.null(pred_prob) && is.numeric(pred_prob) && length(pred_prob) == nrow(test_data) && !all(is.na(test_data$repaid))) {
+      roc_obj <- tryCatch(roc(response = as.numeric(test_data$repaid == "Repaid"),
+                              predictor = as.numeric(pred_prob), quiet = TRUE), error = function(e) NULL)
+      if (!is.null(roc_obj)) auc_val <- as.numeric(auc(roc_obj))
+    }
+  }
+
+  metrics$ROC_AUC <- auc_val
+
+  # store outputs
+  results_list[[mn]] <- list(metrics = metrics, pred_class = pred_class, pred_prob = pred_prob)
+  roc_objects[[mn]] <- roc_obj
+
+  # print confusion matrix + basic metrics immediately for user
+  cat(sprintf("\n--- %s ---\n", mn))
+  if (!is.null(metrics$Confusion)) {
+    cat("Confusion Matrix (TEST):\n"); print(metrics$Confusion)
+    cat(sprintf("Accuracy: %.4f | Sensitivity: %.4f | Specificity: %.4f | Precision: %.4f | F1: %.4f | ROC-AUC: %s\n\n",
+                metrics$Accuracy, metrics$Sensitivity, metrics$Specificity, metrics$Precision, metrics$F1_Score,
+                ifelse(is.na(metrics$ROC_AUC), "NA", sprintf("%.4f", metrics$ROC_AUC))))
+  } else {
+    cat("No confusion/metrics (test labels missing)\n\n")
+  }
+}
+
+# ---------------------------
+# Build comparison table (only metrics present)
+# ---------------------------
+if (length(results_list) == 0) stop("No model produced metrics; cannot compare.")
+
+metric_names <- c("Accuracy","Sensitivity","Specificity","Precision","F1_Score","ROC_AUC")
+comp_df <- data.frame(Model = character(), stringsAsFactors = FALSE)
+
+for (mn in names(results_list)) {
+  m <- results_list[[mn]]$metrics
+  row <- sapply(metric_names, function(k) if (!is.null(m[[k]])) as.numeric(m[[k]]) else NA_real_)
+  comp_df <- rbind(comp_df, data.frame(Model = mn, t(row), stringsAsFactors = FALSE))
+}
+rownames(comp_df) <- NULL
+colnames(comp_df) <- c("Model", metric_names)
+
+# round for nicer display
+comp_df[metric_names] <- lapply(comp_df[metric_names], function(x) ifelse(is.na(x), NA, round(x, 6)))
+
+cat("\n=== Performance Comparison Table (TEST) ===\n")
+print(comp_df)
+cat("\n")
+
+# Save comparison table to CSV
+comp_csv_path <- file.path(SUMMARY_DIR, "model_comparison_test_metrics.csv")
+write.csv(comp_df, comp_csv_path, row.names = FALSE)
+cat("Saved comparison CSV to:", comp_csv_path, "\n\n")
+
+# ---------------------------
+# Best model per metric
+# ---------------------------
+cat("=== Best Model per Metric ===\n\n")
+for (mn in metric_names) {
+  vals <- comp_df[[mn]]
+  if (all(is.na(vals))) {
+    cat(sprintf("- %s: no values\n", mn)); next
+  }
+  best_idx <- which.max(vals)
+  cat(sprintf("- %s: %s (%.6f)\n", mn, comp_df$Model[best_idx], vals[best_idx]))
+}
+cat("\n")
+
+# ---------------------------
+# Overall ranking by average rank across metrics (lower avg rank = better)
+# ---------------------------
+# rank each metric descending (best gets rank 1)
+rank_matrix <- sapply(metric_names, function(k) {
+  v <- comp_df[[k]]
+  if (all(is.na(v))) return(rep(NA_real_, length(v)))
+  rank(-v, ties.method = "average", na.last = "keep")
+})
+avg_rank <- rowMeans(rank_matrix, na.rm = TRUE)
+comp_df$Avg_Rank <- round(avg_rank, 4)
+
+order_idx <- order(comp_df$Avg_Rank, na.last = TRUE)
+cat("=== Overall Ranking (by average rank across metrics) ===\n\n")
+print(comp_df[order_idx, ])
+cat("\nOverall best model (lowest Avg_Rank): ", comp_df$Model[order_idx[1]], "\n\n")
+
+# Save ranked comparison
+ranked_csv_path <- file.path(SUMMARY_DIR, "model_comparison_ranked.csv")
+write.csv(comp_df[order_idx, ], ranked_csv_path, row.names = FALSE)
+cat("Saved ranked comparison CSV to:", ranked_csv_path, "\n\n")
+
+# ---------------------------
+# Save best model summary (based on Avg_Rank first, fallback to ROC_AUC)
+# ---------------------------
+best_overall <- comp_df$Model[order_idx[1]]
+best_row <- comp_df[order_idx[1], ]
+
+# fallback: if Avg_Rank NA, choose max ROC_AUC
+if (is.na(best_row$Avg_Rank)) {
+  if (!all(is.na(comp_df$ROC_AUC))) {
+    best_overall <- comp_df$Model[which.max(comp_df$ROC_AUC)]
+    best_row <- comp_df[comp_df$Model == best_overall, ]
+  }
+}
+
+best_summary_path <- file.path(SUMMARY_DIR, "best_model_summary.txt")
+writeLines(
+  c(
+    paste("Best Model (by Avg_Rank or ROC_AUC):", best_overall),
+    paste("Avg_Rank:", ifelse(is.na(best_row$Avg_Rank), "NA", best_row$Avg_Rank)),
+    paste("ROC_AUC:", ifelse(is.na(best_row$ROC_AUC), "NA", best_row$ROC_AUC)),
+    paste("Accuracy:", ifelse(is.na(best_row$Accuracy), "NA", best_row$Accuracy)),
+    paste("Precision:", ifelse(is.na(best_row$Precision), "NA", best_row$Precision)),
+    paste("Sensitivity (Recall):", ifelse(is.na(best_row$Sensitivity), "NA", best_row$Sensitivity)),
+    paste("F1_Score:", ifelse(is.na(best_row$F1_Score), "NA", best_row$F1_Score))
+  ),
+  best_summary_path
+)
+cat("Saved best model summary to:", best_summary_path, "\n\n")
+
+# ---------------------------
+# ROC curve comparison plot (if any ROC objects exist)
+# ---------------------------
+cat("=== ROC Curve Comparison ===\n")
+roc_plot_models <- names(roc_objects)[sapply(roc_objects, function(x) !is.null(x))]
+if (length(roc_plot_models) == 0) {
+  cat("No ROC objects available to plot (missing probabilities or labels).\n")
+} else {
+  # choose colors (limited palette)
+  cols <- c("blue","red","green","purple","orange","brown","cyan")
+  png_fname <- file.path(SUMMARY_DIR, "model_comparison_roc.png")
+  png(png_fname, width = 900, height = 700)
+  first <- TRUE
+  i <- 1
+  legend_labels <- c()
+  legend_cols <- c()
+  for (mn in roc_plot_models) {
+    roc_obj <- roc_objects[[mn]]
+    if (is.null(roc_obj)) next
+    if (first) {
+      plot(roc_obj, col = cols[i], lwd = 2, main = "ROC Curve Comparison")
+      first <- FALSE
+    } else {
+      lines(roc_obj, col = cols[i], lwd = 2)
+    }
+    legend_labels <- c(legend_labels, sprintf("%s (AUC=%.4f)", mn, as.numeric(auc(roc_obj))))
+    legend_cols <- c(legend_cols, cols[i])
+    i <- i + 1
+    if (i > length(cols)) i <- 1
+  }
+  legend("bottomright", legend = legend_labels, col = legend_cols, lwd = 2)
+  dev.off()
+  cat("Saved ROC comparison to:", png_fname, "\n")
+}
+
+cat("\n=== STEP 8 COMPLETE ===\n")
+cat(rep("=", 70), "\n\n")
+
+
+```
+
+
+
+
